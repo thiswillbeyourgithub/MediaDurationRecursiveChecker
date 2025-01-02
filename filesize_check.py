@@ -25,11 +25,11 @@ def get_duration(file_path: Path, verbose: bool = False) -> int:
         )
         val = int(float(result.stdout.decode('utf-8').strip()))
         if verbose:
-              print(f"{file_path.relative()}: {val}s")
+              print(f"{file_path.relative_to(path)}: {val}s")
         return val
     except (subprocess.CalledProcessError, ValueError) as e:
         if verbose:
-            print(f"E: {file_path.relative()}: {e}s")
+            print(f"E: {file_path.relative_to(path)}: {e}")
         return 0
 
 
