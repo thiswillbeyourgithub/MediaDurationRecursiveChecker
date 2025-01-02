@@ -10,8 +10,14 @@ from tqdm import tqdm
 
 MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.avi', '.mkv', '.mov', '.wav', '.flac'}
 
-def get_duration(file_path: Path, verbose: bool = False) -> int:
-    """Get duration of a media file in seconds."""
+def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int:
+    """Get duration of a media file in seconds.
+    
+    Args:
+        file_path: Path to media file
+        base_path: Base path for relative path calculation
+        verbose: Print detailed processing information
+    """
     # Using ffprobe to get duration
     import subprocess
     try:
@@ -25,11 +31,11 @@ def get_duration(file_path: Path, verbose: bool = False) -> int:
         )
         val = int(float(result.stdout.decode('utf-8').strip()))
         if verbose:
-              print(f"{file_path.relative_to(path)}: {val}s")
+              print(f"{file_path.relative_to(base_path)}: {val}s")
         return val
     except (subprocess.CalledProcessError, ValueError) as e:
         if verbose:
-            print(f"E: {file_path.relative_to(path)}: {e}")
+            print(f"E: {file_path.relative_to(base_path)}: {e}")
         return 0
 
 
@@ -61,7 +67,7 @@ def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = F
     processed_size = 0
     
     for file in tqdm(media_files, desc="Processing files"):
-        duration = get_duration(file, verbose)
+        duration = get_duration(file, path, verbose)
         file_size = file.stat().st_size
         current_duration += duration
         processed_size += file_size
