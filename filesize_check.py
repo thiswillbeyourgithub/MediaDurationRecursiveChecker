@@ -31,11 +31,11 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         )
         val = int(float(result.stdout.decode('utf-8').strip()))
         if verbose:
-              print(f"{file_path.relative_to(base_path)}: {val}s")
+              print(f"{str(file_path.relative_to(base_path))}: {val}s")
         return val
     except (subprocess.CalledProcessError, ValueError) as e:
         if verbose:
-            print(f"E: {file_path.relative_to(base_path)}: {e}")
+            print(f"E: {str(file_path.relative_to(base_path))}: {e}")
         return 0
 
 
@@ -51,7 +51,7 @@ def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = F
     results = {}
     
     # Get all media files
-    media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS]
+    media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
     if verbose:
         pprint(media_files)
     random.shuffle(media_files)
