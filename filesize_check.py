@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pprint import pprint
+import json
 import random
 from pathlib import Path
 from typing import List
@@ -31,9 +32,17 @@ def get_duration(file_path: Path, verbose: bool = False) -> int:
             print(f"E: {file_path.relative()}: {e}s")
         return 0
 
-def main(filepath: str, outpath = str, verbose: bool = False) -> None:
-    """Main function to calculate total duration of media files."""
+
+def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = False) -> None:
+    """Main function to calculate total duration of media files.
+    
+    Args:
+        filepath: Path to directory containing media files
+        outpath: Path to output JSON file (default: media_durations.json)
+        verbose: Print detailed processing information
+    """
     path = Path(filepath)
+    results = {}
     
     # Get all media files
     media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS]
@@ -53,8 +62,15 @@ def main(filepath: str, outpath = str, verbose: bool = False) -> None:
     
     for file in tqdm(media_files, desc="Processing files"):
         duration = get_duration(file, verbose)
+        file_size = file.stat().st_size
         current_duration += duration
-        processed_size += file.stat().st_size
+        processed_size += file_size
+        
+        # Store results
+        results[str(file)] = {
+            'duration': duration,
+            'size': file_size
+        }
         
         # Calculate estimated total duration
         if processed_size > 0:
@@ -63,6 +79,11 @@ def main(filepath: str, outpath = str, verbose: bool = False) -> None:
                       f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m")
     
     print(f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m")
+    
+    # Write results to JSON file
+    with open(outpath, 'w') as f:
+        json.dump(results, f, indent=2)
+    print(f"Results saved to {outpath}")
 
 if __name__ == '__main__':
     fire.Fire(main)
