@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from pprint import pprint
 import random
 from pathlib import Path
 from typing import List
@@ -8,7 +9,7 @@ from tqdm import tqdm
 
 MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.avi', '.mkv', '.mov', '.wav', '.flac'}
 
-def get_duration(file_path: Path) -> int:
+def get_duration(file_path: Path, verbose: bool = False) -> int:
     """Get duration of a media file in seconds."""
     # Using ffprobe to get duration
     import subprocess
@@ -21,16 +22,23 @@ def get_duration(file_path: Path) -> int:
             stderr=subprocess.PIPE,
             check=True
         )
-        return int(float(result.stdout.decode('utf-8').strip()))
-    except (subprocess.CalledProcessError, ValueError):
+        val = int(float(result.stdout.decode('utf-8').strip()))
+        if verbose:
+              print(f"{file_path.relative()}: {val}s")
+        return val
+    except (subprocess.CalledProcessError, ValueError) as e:
+        if verbose:
+            print(f"E: {file_path.relative()}: {e}s")
         return 0
 
-def main(filepath: str) -> None:
+def main(filepath: str, outpath = str, verbose: bool = False) -> None:
     """Main function to calculate total duration of media files."""
     path = Path(filepath)
     
     # Get all media files
     media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS]
+    if verbose:
+        pprint(media_files)
     random.shuffle(media_files)
     
     # Calculate total size
@@ -44,7 +52,7 @@ def main(filepath: str) -> None:
     processed_size = 0
     
     for file in tqdm(media_files, desc="Processing files"):
-        duration = get_duration(file)
+        duration = get_duration(file, verbose)
         current_duration += duration
         processed_size += file.stat().st_size
         
