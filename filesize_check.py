@@ -53,7 +53,7 @@ def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = F
     # Get all media files
     media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
     if verbose:
-        pprint(media_files)
+        pprint([f.name for f in media_files])
     random.shuffle(media_files)
     
     # Calculate total size
