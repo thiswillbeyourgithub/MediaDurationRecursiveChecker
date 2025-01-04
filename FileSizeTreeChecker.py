@@ -23,8 +23,12 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         verbose: Print detailed processing information
     """
     # Using moviepy to get duration
+    import warnings
     from moviepy.video.io.VideoFileClip import VideoFileClip
     try:
+        # Suppress warnings unless verbose mode
+        if not verbose:
+            warnings.filterwarnings("ignore", category=UserWarning)
         with VideoFileClip(str(file_path)) as clip:
             val = int(clip.duration)
             if verbose:
