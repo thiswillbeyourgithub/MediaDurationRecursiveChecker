@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox
 from pprint import pprint
 import json
 import random
 from pathlib import Path
 from typing import List
-import argparse
+import threading
 try:
     from tqdm import tqdm
     has_tqdm = True
@@ -42,21 +44,82 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         return 0
 
 
-def main() -> None:
-    """Main function to calculate total duration of media files."""
-    parser = argparse.ArgumentParser(description='Calculate total duration of media files')
-    parser.add_argument('filepath', type=str, help='Path to directory containing media files')
-    parser.add_argument('--outpath', type=str, default="media_durations.json",
-                       help='Path to output JSON file (default: media_durations.json)')
-    parser.add_argument('--verbose', action='store_true',
-                       help='Print detailed processing information')
-    args = parser.parse_args()
-
-    filepath = args.filepath
-    outpath = args.outpath
-    verbose = args.verbose
-    path = Path(filepath)
-    results = {}
+class MediaDurationApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Media Duration Calculator")
+        self.root.geometry("500x300")
+        
+        # Folder selection
+        self.folder_frame = ttk.LabelFrame(root, text="Select Folder")
+        self.folder_frame.pack(fill="x", padx=10, pady=5)
+        
+        self.folder_path = tk.StringVar()
+        self.folder_entry = ttk.Entry(self.folder_frame, textvariable=self.folder_path)
+        self.folder_entry.pack(side="left", fill="x", expand=True, padx=5, pady=5)
+        
+        self.browse_button = ttk.Button(self.folder_frame, text="Browse", command=self.select_folder)
+        self.browse_button.pack(side="right", padx=5, pady=5)
+        
+        # Options
+        self.options_frame = ttk.LabelFrame(root, text="Options")
+        self.options_frame.pack(fill="x", padx=10, pady=5)
+        
+        self.save_json = tk.BooleanVar(value=True)
+        self.json_check = ttk.Checkbutton(self.options_frame, text="Save results to JSON", 
+                                        variable=self.save_json)
+        self.json_check.pack(anchor="w", padx=5, pady=2)
+        
+        self.verbose_mode = tk.BooleanVar(value=False)
+        self.verbose_check = ttk.Checkbutton(self.options_frame, text="Verbose output", 
+                                           variable=self.verbose_mode)
+        self.verbose_check.pack(anchor="w", padx=5, pady=2)
+        
+        # Progress
+        self.progress_frame = ttk.LabelFrame(root, text="Progress")
+        self.progress_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        
+        self.progress_text = tk.Text(self.progress_frame, height=10, state="disabled")
+        self.progress_text.pack(fill="both", expand=True, padx=5, pady=5)
+        
+        # Start button
+        self.start_button = ttk.Button(root, text="Start Processing", command=self.start_processing)
+        self.start_button.pack(pady=10)
+        
+    def select_folder(self):
+        folder = filedialog.askdirectory()
+        if folder:
+            self.folder_path.set(folder)
+            
+    def log_message(self, message):
+        self.progress_text.config(state="normal")
+        self.progress_text.insert("end", message + "\n")
+        self.progress_text.see("end")
+        self.progress_text.config(state="disabled")
+        self.root.update_idletasks()
+        
+    def start_processing(self):
+        folder = self.folder_path.get()
+        if not folder:
+            messagebox.showerror("Error", "Please select a folder first")
+            return
+            
+        # Disable UI during processing
+        self.browse_button.config(state="disabled")
+        self.start_button.config(state="disabled")
+        
+        # Run processing in separate thread
+        processing_thread = threading.Thread(
+            target=self.process_folder,
+            args=(folder,),
+            daemon=True
+        )
+        processing_thread.start()
+        
+    def process_folder(self, folder):
+        try:
+            path = Path(folder)
+            results = {}
     
     # Get all media files
     media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
@@ -68,48 +131,65 @@ def main() -> None:
     total_size = sum(f.stat().st_size for f in media_files)
     total_size_gb = total_size / (1024 ** 3)
     
-    print(f"Found {len(media_files)} media files ({total_size_gb:.2f} GB)")
-    
-    # Process files
-    current_duration = 0
-    processed_size = 0
-    
-    if has_tqdm:
-        file_iter = tqdm(media_files, desc="Processing files")
-    else:
-        file_iter = media_files
-        print(f"Processing {len(media_files)} files...")
-    
-    for i, file in enumerate(file_iter):
-        duration = get_duration(file, path, verbose)
-        file_size = file.stat().st_size
-        current_duration += duration
-        processed_size += file_size
-        
-        # Store results
-        results[str(file)] = {
-            'duration': duration,
-            'size': file_size
-        }
-        
-        # Calculate estimated total duration
-        if processed_size > 0:
-            estimated_total = (total_size / processed_size) * current_duration
-            progress_msg = f"Current: {current_duration//3600}h {(current_duration%3600)//60}m | " \
-                         f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+            # Get all media files
+            media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
+            if self.verbose_mode.get():
+                self.log_message("Files to process:")
+                for f in media_files:
+                    self.log_message(f"  {f.name}")
             
-            if i % 10 == 0:  # Print progress every 10 files
-                if has_tqdm:
-                    tqdm.write(progress_msg)
-                else:
-                    print(f"[{i+1}/{len(media_files)}] {progress_msg}")
-    
-    print(f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m")
-    
-    # Write results to JSON file
-    with open(outpath, 'w') as f:
-        json.dump(results, f, indent=2)
-    print(f"Results saved to {outpath}")
+            random.shuffle(media_files)
+            
+            # Calculate total size
+            total_size = sum(f.stat().st_size for f in media_files)
+            total_size_gb = total_size / (1024 ** 3)
+            
+            self.log_message(f"Found {len(media_files)} media files ({total_size_gb:.2f} GB)")
+            
+            # Process files
+            current_duration = 0
+            processed_size = 0
+            
+            for i, file in enumerate(media_files):
+                duration = get_duration(file, path, self.verbose_mode.get())
+                file_size = file.stat().st_size
+                current_duration += duration
+                processed_size += file_size
+                
+                # Store results
+                results[str(file)] = {
+                    'duration': duration,
+                    'size': file_size
+                }
+                
+                # Calculate estimated total duration
+                if processed_size > 0:
+                    estimated_total = (total_size / processed_size) * current_duration
+                    progress_msg = f"[{i+1}/{len(media_files)}] Current: {current_duration//3600}h {(current_duration%3600)//60}m | " \
+                                 f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+                    
+                    if i % 10 == 0:  # Update progress every 10 files
+                        self.log_message(progress_msg)
+            
+            self.log_message(f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m")
+            
+            # Write results to JSON file if enabled
+            if self.save_json.get():
+                outpath = path / "media_durations.json"
+                with open(outpath, 'w') as f:
+                    json.dump(results, f, indent=2)
+                self.log_message(f"Results saved to {outpath}")
+            
+            messagebox.showinfo("Processing Complete", "Media duration calculation finished!")
+            
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+        finally:
+            # Re-enable UI
+            self.browse_button.config(state="normal")
+            self.start_button.config(state="normal")
 
 if __name__ == '__main__':
-    main()
+    root = tk.Tk()
+    app = MediaDurationApp(root)
+    root.mainloop()
