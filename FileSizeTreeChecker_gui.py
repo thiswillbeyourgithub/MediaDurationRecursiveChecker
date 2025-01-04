@@ -121,15 +121,18 @@ class MediaDurationApp:
             path = Path(folder)
             results = {}
     
-    # Get all media files
-    media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
-    if verbose:
-        pprint([f.name for f in media_files])
-    random.shuffle(media_files)
-    
-    # Calculate total size
-    total_size = sum(f.stat().st_size for f in media_files)
-    total_size_gb = total_size / (1024 ** 3)
+            # Get all media files
+            media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
+            if self.verbose_mode.get():
+                self.log_message("Files to process:")
+                for f in media_files:
+                    self.log_message(f"  {f.name}")
+            
+            random.shuffle(media_files)
+            
+            # Calculate total size
+            total_size = sum(f.stat().st_size for f in media_files)
+            total_size_gb = total_size / (1024 ** 3)
     
             # Get all media files
             media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
