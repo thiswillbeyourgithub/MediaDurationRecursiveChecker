@@ -19,13 +19,14 @@ This Python script calculates the total duration of media files (video/audio) in
 
 - Python 3.6+
 - `ffmpeg` (for `ffprobe`)
-- Python packages: `fire`, `tqdm`
+
+## Optional Packages
+
+- `tqdm` (for progress bars) - will be used if installed but not required
 
 ## Installation
 
-```bash
-pip install fire tqdm
-```
+No installation required - just ensure `ffmpeg` is installed on your system.
 
 ## Usage
 
