@@ -28,6 +28,17 @@ This Python script calculates the total duration of media files (video/audio) in
 
 No installation required - just ensure `ffmpeg` is installed on your system.
 
+## Building with PyInstaller
+
+To create a standalone executable on macOS:
+
+```bash
+pip install pyinstaller
+pyinstaller --onefile --name FilesizeTreeChecker filesize_check.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console
+```
+
+This will create a single executable file in the `dist` directory.
+
 ## Usage
 
 Basic usage:
