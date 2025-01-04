@@ -23,7 +23,7 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         verbose: Print detailed processing information
     """
     # Using moviepy to get duration
-    from moviepy.editor import VideoFileClip
+    from moviepy.video.io.VideoFileClip import VideoFileClip
     try:
         with VideoFileClip(str(file_path)) as clip:
             val = int(clip.duration)
