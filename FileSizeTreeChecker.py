@@ -1,4 +1,41 @@
 #!/usr/bin/env python3
+"""Media Duration and Size Analyzer
+
+This script calculates the total duration and size of media files in a directory tree.
+It supports common media formats including MP3, MP4, AVI, MKV, MOV, WAV, and FLAC.
+
+Key Features:
+- Recursively scans directories for media files
+- Calculates total duration in hours and minutes
+- Estimates total processing time based on file sizes
+- Saves results to a JSON file with individual file details
+- Progress tracking with tqdm (if installed)
+- Verbose mode for detailed processing information
+
+Usage:
+    python FileSizeTreeChecker.py /path/to/media [--outpath output.json] [--verbose]
+
+Arguments:
+    filepath    : Path to directory containing media files
+    --outpath   : Path to output JSON file (default: media_durations.json)
+    --verbose   : Print detailed processing information for each file
+
+Output JSON Format:
+{
+    "file_path": {
+        "duration": seconds,
+        "size": bytes
+    },
+    ...
+}
+
+Dependencies:
+    moviepy>=1.0.0 - For media file duration extraction
+    tqdm>=4.0.0    - For progress bars (optional)
+
+Example:
+    python FileSizeTreeChecker.py ~/Videos --outpath video_stats.json --verbose
+"""
 # /// script
 # requires-python = ">=3.8"
 # dependencies = [
