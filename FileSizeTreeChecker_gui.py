@@ -1,4 +1,51 @@
 #!/usr/bin/env python3
+"""Media Duration Calculator GUI Application
+
+This application provides a graphical interface for calculating the total duration
+of media files in a directory tree. It supports various media formats and provides
+detailed progress reporting and results saving.
+
+Features:
+- Supports multiple media formats: MP3, MP4, AVI, MKV, MOV, WAV, FLAC
+- Recursively scans directories for media files
+- Calculates total duration in hours and minutes
+- Estimates total processing time during calculation
+- Provides verbose output mode for detailed processing information
+- Saves results to JSON file with duration and size for each file
+- Progress reporting with current and estimated total duration
+- Threaded processing to keep UI responsive
+- Cross-platform support (Windows, macOS, Linux)
+
+Dependencies:
+- moviepy: For media file duration extraction
+- tqdm: Optional for progress bars (if available)
+
+Usage:
+1. Launch the application
+2. Select a folder containing media files
+3. Choose options (verbose mode, JSON output)
+4. Click "Start Processing"
+5. View progress in the output window
+6. Results will be displayed and optionally saved to JSON
+
+The application handles large media collections efficiently by:
+- Processing files in random order to prevent media type bias
+- Providing real-time progress updates
+- Using threading to maintain responsive UI
+- Implementing error handling for problematic files
+
+JSON Output Format:
+{
+    "path/to/file1.mp4": {
+        "duration": 3600,  // in seconds
+        "size": 1048576    // in bytes
+    },
+    ...
+}
+
+Note: Some media files may not report accurate durations due to encoding issues.
+The application will skip these files and continue processing others.
+"""
 # /// script
 # requires-python = ">=3.8"
 # dependencies = [
