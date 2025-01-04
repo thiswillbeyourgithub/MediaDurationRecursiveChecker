@@ -22,23 +22,16 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         base_path: Base path for relative path calculation
         verbose: Print detailed processing information
     """
-    # Using ffprobe to get duration
-    import subprocess
+    # Using moviepy to get duration
+    from moviepy.editor import VideoFileClip
     try:
-        result = subprocess.run(
-            ['ffprobe', '-v', 'error', '-show_entries', 
-             'format=duration', '-of', 
-             'default=noprint_wrappers=1:nokey=1', str(file_path)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True
-        )
-        val = int(float(result.stdout.decode('utf-8').strip()))
-        if verbose:
-            filename = str(file_path.relative_to(base_path))
-            print(f"{filename:<50}: {val:>6}s")
-        return val
-    except (subprocess.CalledProcessError, ValueError) as e:
+        with VideoFileClip(str(file_path)) as clip:
+            val = int(clip.duration)
+            if verbose:
+                filename = str(file_path.relative_to(base_path))
+                print(f"{filename:<50}: {val:>6}s")
+            return val
+    except Exception as e:
         if verbose:
             filename = str(file_path.relative_to(base_path))
             print(f"E: {filename:<50}: {e}")
