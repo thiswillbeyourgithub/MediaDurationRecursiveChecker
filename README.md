@@ -19,6 +19,7 @@ This Python script calculates the total duration of media files (video/audio) in
 
 - Python 3.6+
 - `ffmpeg` (for `ffprobe`)
+- `moviepy` (for media duration extraction)
 
 ## Optional Packages
 
@@ -26,15 +27,20 @@ This Python script calculates the total duration of media files (video/audio) in
 
 ## Installation
 
-No installation required - just ensure `ffmpeg` is installed on your system.
+Install required Python packages:
+```bash
+pip install moviepy
+```
+
+Ensure `ffmpeg` is installed on your system.
 
 ## Building with PyInstaller
 
 To create a standalone executable on macOS:
 
 ```bash
-pip install pyinstaller
-pyinstaller --onefile --name FilesizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console
+pip install pyinstaller moviepy
+pyinstaller --onefile --name FilesizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console --hidden-import=imageio_ffmpeg
 ```
 
 This will create a single executable file in the `dist` directory.
