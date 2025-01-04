@@ -5,7 +5,7 @@ import json
 import random
 from pathlib import Path
 from typing import List
-import fire
+import argparse
 try:
     from tqdm import tqdm
     has_tqdm = True
@@ -45,14 +45,19 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         return 0
 
 
-def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = False) -> None:
-    """Main function to calculate total duration of media files.
-    
-    Args:
-        filepath: Path to directory containing media files
-        outpath: Path to output JSON file (default: media_durations.json)
-        verbose: Print detailed processing information
-    """
+def main() -> None:
+    """Main function to calculate total duration of media files."""
+    parser = argparse.ArgumentParser(description='Calculate total duration of media files')
+    parser.add_argument('filepath', type=str, help='Path to directory containing media files')
+    parser.add_argument('--outpath', type=str, default="media_durations.json",
+                       help='Path to output JSON file (default: media_durations.json)')
+    parser.add_argument('--verbose', action='store_true',
+                       help='Print detailed processing information')
+    args = parser.parse_args()
+
+    filepath = args.filepath
+    outpath = args.outpath
+    verbose = args.verbose
     path = Path(filepath)
     results = {}
     
@@ -110,4 +115,4 @@ def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = F
     print(f"Results saved to {outpath}")
 
 if __name__ == '__main__':
-    fire.Fire(main)
+    main()
