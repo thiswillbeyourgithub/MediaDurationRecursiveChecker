@@ -34,7 +34,7 @@ To create a standalone executable on macOS:
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --name FilesizeTreeChecker filesize_check.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console
+pyinstaller --onefile --name FilesizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console
 ```
 
 This will create a single executable file in the `dist` directory.
