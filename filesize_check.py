@@ -6,7 +6,11 @@ import random
 from pathlib import Path
 from typing import List
 import fire
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+    has_tqdm = True
+except ImportError:
+    has_tqdm = False
 
 MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.avi', '.mkv', '.mov', '.wav', '.flac'}
 
@@ -68,7 +72,13 @@ def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = F
     current_duration = 0
     processed_size = 0
     
-    for file in tqdm(media_files, desc="Processing files"):
+    if has_tqdm:
+        file_iter = tqdm(media_files, desc="Processing files")
+    else:
+        file_iter = media_files
+        print(f"Processing {len(media_files)} files...")
+    
+    for i, file in enumerate(file_iter):
         duration = get_duration(file, path, verbose)
         file_size = file.stat().st_size
         current_duration += duration
@@ -83,8 +93,14 @@ def main(filepath: str, outpath: str = "media_durations.json", verbose: bool = F
         # Calculate estimated total duration
         if processed_size > 0:
             estimated_total = (total_size / processed_size) * current_duration
-            tqdm.write(f"Current: {current_duration//3600}h {(current_duration%3600)//60}m | "
-                      f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m")
+            progress_msg = f"Current: {current_duration//3600}h {(current_duration%3600)//60}m | " \
+                         f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+            
+            if i % 10 == 0:  # Print progress every 10 files
+                if has_tqdm:
+                    tqdm.write(progress_msg)
+                else:
+                    print(f"[{i+1}/{len(media_files)}] {progress_msg}")
     
     print(f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m")
     
