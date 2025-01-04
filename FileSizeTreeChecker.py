@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.8"
+# dependencies = [
+#     "moviepy>=1.0.0",
+#     "tqdm>=4.0.0",
+# ]
+# ///
 
 from pprint import pprint
 import json
