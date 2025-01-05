@@ -35,10 +35,10 @@ jobs:
             # On macOS, install universal2 versions of dependencies
             export ARCHFLAGS="-arch x86_64 -arch arm64"
             pip install -U moviepy --no-binary :all:
-            pip install -U pyclip --no-binary :all:
+            pip install -U pyperclip
           else
             pip install -U moviepy
-            pip install -U pyclip
+            pip install -U pyperclip
           fi
 
       - name: Compile script with PyInstaller
