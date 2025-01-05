@@ -117,23 +117,36 @@ class MediaDurationApp:
             self.root.eval('tk::PlaceWindow . center')
         
         # Documentation section
-        self.doc_frame = ttk.LabelFrame(root, text="Documentation (click to expand)")
+        self.doc_frame = ttk.Frame(root)
         self.doc_frame.pack(fill="x", padx=10, pady=5)
         
-        # Add click handler to toggle visibility
-        self.doc_frame.bind("<Button-1>", self.toggle_documentation)
+        # Clickable label to show/hide docs
+        self.doc_label = ttk.Label(
+            self.doc_frame, 
+            text="▼ Documentation (click to expand)",
+            cursor="hand2",
+            foreground="blue"
+        )
+        self.doc_label.pack(fill="x")
+        self.doc_label.bind("<Button-1>", self.toggle_documentation)
         
         # Text widget for documentation
-        self.doc_text = tk.Text(self.doc_frame, height=10, wrap="word", state="disabled")
-        self.doc_text.pack(fill="x", padx=5, pady=5)
+        self.doc_text = tk.Text(
+            self.doc_frame, 
+            height=10, 
+            wrap="word", 
+            state="disabled",
+            padx=5,
+            pady=5
+        )
         
         # Insert the docstring
         self.doc_text.config(state="normal")
         self.doc_text.insert("1.0", __doc__)
         self.doc_text.config(state="disabled")
         
-        # Start with documentation collapsed
-        self.doc_text.pack_forget()
+        # Start with documentation hidden
+        self.docs_visible = False
         
         # Folder selection
         self.folder_frame = ttk.LabelFrame(root, text="Select Folder")
@@ -463,12 +476,14 @@ class MediaDurationApp:
         
     def toggle_documentation(self, event=None):
         """Toggle visibility of documentation section."""
-        if self.doc_text.winfo_ismapped():
+        if self.docs_visible:
             self.doc_text.pack_forget()
-            self.doc_frame.config(text="Documentation (click to expand)")
+            self.doc_label.config(text="▼ Documentation (click to expand)")
+            self.docs_visible = False
         else:
             self.doc_text.pack(fill="x", padx=5, pady=5)
-            self.doc_frame.config(text="Documentation (click to collapse)")
+            self.doc_label.config(text="▲ Documentation (click to collapse)")
+            self.docs_visible = True
 
 if __name__ == '__main__':
     try:
