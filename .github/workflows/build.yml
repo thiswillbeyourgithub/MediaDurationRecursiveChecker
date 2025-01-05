@@ -12,8 +12,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]  # Add all OSes
-    runs-on: ${{ matrix.os }}  # Use the matrix OS
+        os: [ubuntu-latest, windows-latest, macos-14, macos-13]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -28,30 +28,34 @@ jobs:
         shell: bash
         run: |
           python -m pip install --upgrade pip
-          # install a working numpy to avoid issues with numpy 2.0
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            # On macOS, install universal2 versions of dependencies
+          if [[ "${{ matrix.os }}" == "macos-14" ]]; then
+            # On macOS M1
             export ARCHFLAGS="-arch x86_64 -arch arm64"
-            pip install numpy==1.25.0
-            pip install pyinstaller
+          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
+            # On macOS with intel cpus
+            export ARCHFLAGS="-arch x86_64"
+          fi
+          # install a working numpy to avoid issues with numpy 2.0
+          pip install numpy==1.25.0
+          pip install pyperclip
+          pip install pyinstaller
+          if [[ "${{ matrix.os }}" == "macos-14" ]]; then
             pip install moviepy --no-binary :all:
-            pip install pyperclip
+          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
+            pip install moviepy --no-binary :all:
           else
-            pip install numpy==1.25.0
-            pip install pyinstaller
             pip install moviepy
-            pip install pyperclip
           fi
 
       - name: Compile script with PyInstaller
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            # Build Intel binary
-            # pyinstaller --onefile --name FileSizeTreeChecker-intel FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
-            
+          if [[ "${{ matrix.os }}" == "macos-14" ]]; then
             # Build Apple Silicon binary
             pyinstaller --onefile --name FileSizeTreeChecker-arm64 FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture arm64 --clean
+          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
+            # Build Intel binary
+            pyinstaller --onefile --name FileSizeTreeChecker-intel FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
           else
             # On other platforms, use default architecture
             pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --clean
