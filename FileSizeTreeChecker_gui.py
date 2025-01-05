@@ -221,24 +221,34 @@ class MediaDurationApp:
         temp_dir = Path(tempfile.gettempdir())
         return temp_dir / "FileSizeTreeChecker_latest_path.txt"
 
-    def _save_last_path(self, path: str) -> None:
-        """Save the last selected path to a temporary file."""
+    def _is_valid_path(self, path: str) -> bool:
+        """Check if a path is valid and accessible."""
         try:
-            last_path_file = self._get_last_path_file()
-            with open(last_path_file, "w") as f:
-                f.write(path)
+            return os.path.exists(path) and os.path.isdir(path)
+        except Exception:
+            return False
+
+    def _save_last_path(self, path: str) -> None:
+        """Save the last selected path to a temporary file only if valid."""
+        try:
+            if self._is_valid_path(path):
+                last_path_file = self._get_last_path_file()
+                with open(last_path_file, "w") as f:
+                    f.write(path)
         except Exception:
             pass  # Silently ignore any errors
 
     def _load_last_path(self) -> Optional[str]:
-        """Load the last selected path from temporary file if it exists."""
+        """Load the last selected path from temporary file if it exists and is valid."""
         try:
             last_path_file = self._get_last_path_file()
             if last_path_file.exists():
                 with open(last_path_file, "r") as f:
                     path = f.read().strip()
-                    if path and os.path.exists(path):
+                    if path and self._is_valid_path(path):
                         return path
+                    # Clean up invalid path file
+                    os.remove(last_path_file)
         except Exception:
             pass  # Silently ignore any errors
         return None
@@ -246,10 +256,17 @@ class MediaDurationApp:
     def select_folder(self):
         folder = filedialog.askdirectory()
         if folder:
-            self.folder_path.set(folder)
-            self._save_last_path(folder)
-            # Set default output path
-            self.output_path.set(str(Path(folder) / "media_durations.json"))
+            if self._is_valid_path(folder):
+                self.folder_path.set(folder)
+                self._save_last_path(folder)
+                # Set default output path
+                self.output_path.set(str(Path(folder) / "media_durations.json"))
+            else:
+                messagebox.showerror(
+                    "Invalid Path",
+                    f"The selected path is not accessible:\n{folder}\n\n"
+                    "Please select a valid directory."
+                )
             
     def select_output_file(self):
         output_file = filedialog.asksaveasfilename(
