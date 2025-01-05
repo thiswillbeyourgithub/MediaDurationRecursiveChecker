@@ -128,7 +128,7 @@ class MediaDurationApp:
         # Clickable label to show/hide docs
         self.doc_label = ttk.Label(
             self.doc_frame, 
-            text="▼ Documentation (click to expand)",
+            text="▲ Documentation (click to expand)",
             cursor="hand2",
             foreground="blue"
         )
@@ -493,11 +493,11 @@ class MediaDurationApp:
         """Toggle visibility of documentation section."""
         if self.docs_visible:
             self.doc_text.pack_forget()
-            self.doc_label.config(text="▼ Documentation (click to expand)")
+            self.doc_label.config(text="▲ Documentation (click to expand)")
             self.docs_visible = False
         else:
             self.doc_text.pack(fill="x", padx=5, pady=5)
-            self.doc_label.config(text="▲ Documentation (click to collapse)")
+            self.doc_label.config(text="▼ Documentation (click to collapse)")
             self.docs_visible = True
 
 if __name__ == '__main__':
