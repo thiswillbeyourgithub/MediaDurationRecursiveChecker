@@ -10,10 +10,9 @@ This Python script calculates the total duration of media files (video/audio) in
 - Provides:
   - Total number of media files
   - Total size in GB
-  - Current and estimated total duration
-  - Progress bar with time estimates
+  - Total duration of all files (and estimation every 10 files)
   - Verbose output with individual file durations
-  - Results saved to JSON file
+  - Results optionally saved to JSON file
 
 ## Requirements
 
