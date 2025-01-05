@@ -39,6 +39,10 @@ python FileSizeTreeChecker.py
 ### 2. Use Pre-built Binaries (Recommended)
 - Download the latest release from GitHub
 - No installation required - just run the executable
+- Pre-built binaries available for:
+  - Windows (64-bit)
+  - macOS (Intel and Apple Silicon/M1)
+  - Linux (64-bit)
 - Binaries are built automatically using GitHub Actions
 
 ### 3. Build Your Own Executable
