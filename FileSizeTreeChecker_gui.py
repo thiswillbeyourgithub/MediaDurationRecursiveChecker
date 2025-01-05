@@ -270,6 +270,24 @@ class MediaDurationApp:
             messagebox.showerror("Error", "Please select a folder first")
             return
             
+        # Check if path exists
+        if not os.path.exists(folder):
+            messagebox.showerror(
+                "Error", 
+                f"The selected path does not exist:\n{folder}\n\n"
+                "Please check the path and try again."
+            )
+            return
+            
+        # Check if it's actually a directory
+        if not os.path.isdir(folder):
+            messagebox.showerror(
+                "Error", 
+                f"The selected path is not a directory:\n{folder}\n\n"
+                "Please select a valid directory."
+            )
+            return
+            
         # Reset cancel flag
         self.cancel_requested = False
         
