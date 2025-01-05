@@ -157,7 +157,6 @@ class FileSizeTreeChecker:
         self.folder_frame = ttk.LabelFrame(self.main_container, text="Select Folder")
         self.folder_frame.grid(row=1, column=0, sticky="ew", padx=5, pady=2)
         
-        self.folder_path = tk.StringVar()
         self.folder_entry = ttk.Entry(self.folder_frame, textvariable=self.folder_path)
         self.folder_entry.pack(side="left", fill="x", expand=True, padx=5, pady=5)
         # Add clipboard and select-all shortcuts
