@@ -98,7 +98,7 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         return 0
 
 
-class MediaDurationApp:
+class FileSizeTreeChecker:
     def __init__(self, root):
         self.root = root
         self.root.title("Media Duration Calculator")
@@ -510,7 +510,7 @@ class MediaDurationApp:
 if __name__ == '__main__':
     try:
         root = tk.Tk()
-        app = MediaDurationApp(root)
+        app = FileSizeTreeChecker(root)
         root.mainloop()
     except KeyboardInterrupt:
         print("\nKeyboard interrupt received. Exiting gracefully...")
