@@ -175,7 +175,7 @@ class MediaDurationApp:
         self.output_entry.bind("<Control-c>", lambda e: pyperclip.copy(self.output_entry.get()))
         self.output_entry.bind("<Command-c>", lambda e: pyperclip.copy(self.output_entry.get()))
         self.output_entry.bind("<Control-v>", lambda e: self.output_entry.insert(0, pyperclip.paste()))
-        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyclip.paste()))
+        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyperclip.paste()))
         
         self.output_browse_button = ttk.Button(self.output_frame, text="Browse", 
                                              command=self.select_output_file, state="disabled")
