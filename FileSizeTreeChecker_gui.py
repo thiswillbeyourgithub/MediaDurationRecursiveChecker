@@ -64,8 +64,9 @@ from pprint import pprint
 import json
 import random
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import threading
+import os
 try:
     from tqdm import tqdm
     has_tqdm = True
@@ -107,6 +108,13 @@ class MediaDurationApp:
         self.root = root
         self.root.title("Media Duration Calculator")
         self.root.geometry("500x300")
+        
+        # Try to load last used path
+        last_path = self._load_last_path()
+        if last_path:
+            self.folder_path = tk.StringVar(value=last_path)
+        else:
+            self.folder_path = tk.StringVar()
         
         # Folder selection
         self.folder_frame = ttk.LabelFrame(root, text="Select Folder")
@@ -157,10 +165,31 @@ class MediaDurationApp:
                        foreground='white',
                        background='#0078d7')
         
+    def _save_last_path(self, path: str) -> None:
+        """Save the last selected path to a temporary file."""
+        try:
+            with open("FileSizeTreeChecker_latest_path.txt", "w") as f:
+                f.write(path)
+        except Exception:
+            pass  # Silently ignore any errors
+
+    def _load_last_path(self) -> Optional[str]:
+        """Load the last selected path from temporary file if it exists."""
+        try:
+            if os.path.exists("FileSizeTreeChecker_latest_path.txt"):
+                with open("FileSizeTreeChecker_latest_path.txt", "r") as f:
+                    path = f.read().strip()
+                    if path and os.path.exists(path):
+                        return path
+        except Exception:
+            pass  # Silently ignore any errors
+        return None
+
     def select_folder(self):
         folder = filedialog.askdirectory()
         if folder:
             self.folder_path.set(folder)
+            self._save_last_path(folder)
             
     def log_message(self, message):
         self.progress_text.config(state="normal")
