@@ -137,8 +137,21 @@ class MediaDurationApp:
         self.progress_text.pack(fill="both", expand=True, padx=5, pady=5)
         
         # Start button
-        self.start_button = ttk.Button(root, text="Start Processing", command=self.start_processing)
-        self.start_button.pack(pady=10)
+        self.start_button = ttk.Button(
+            root, 
+            text="Start Processing", 
+            command=self.start_processing,
+            style='Accent.TButton'
+        )
+        self.start_button.pack(pady=20, fill='x', padx=50)
+        
+        # Configure styles
+        style = ttk.Style()
+        style.configure('Accent.TButton', 
+                       font=('Helvetica', 12, 'bold'),
+                       padding=10,
+                       foreground='white',
+                       background='#0078d7')
         
     def select_folder(self):
         folder = filedialog.askdirectory()
