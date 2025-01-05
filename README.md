@@ -16,13 +16,8 @@ This Python script calculates the total duration of media files (video/audio) in
 
 ## Requirements
 
-- Python 3.6+
-- `ffmpeg` (for `ffprobe`)
+- Python 3.6+ (only tested on 3.11)
 - `moviepy` (for media duration extraction)
-
-## Optional Packages
-
-- `tqdm` (for progress bars) - will be used if installed but not required
 
 ## Installation
 
