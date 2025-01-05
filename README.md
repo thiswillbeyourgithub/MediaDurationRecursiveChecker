@@ -1,5 +1,10 @@
 # FileSizeTreeChecker
 
+> Une version française de ce fichier README est disponible : [README_fr.md](README_fr.md)  
+> A French version of this README is available: [README_fr.md](README_fr.md)
+
+# FileSizeTreeChecker
+
 This Python script calculates the total duration of media files (video/audio) in a directory and estimates the total processing time. It was created to help estimate the total duration of daily/rush footage on a hard drive.
 
 ## Features
