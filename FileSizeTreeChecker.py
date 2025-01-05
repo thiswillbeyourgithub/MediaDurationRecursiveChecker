@@ -366,10 +366,6 @@ class MediaDurationApp:
     
             # Get all media files
             media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
-            if self.verbose_mode.get():
-                # Batch file list display
-                file_list = "\n".join(f"  {f.name}" for f in media_files)
-                self.log_message("Files to process:\n" + file_list)
             
             random.shuffle(media_files)
             
