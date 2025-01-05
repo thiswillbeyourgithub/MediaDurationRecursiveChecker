@@ -270,7 +270,9 @@ class FileSizeTreeChecker:
                        font=('Helvetica', 12, 'bold'),
                        padding=10,
                        foreground='white',
-                       background='#0078d7')
+                       background='#800080')
+        style.map('Accent.TButton',
+                 background=[('active', '#800080'), ('!active', '#800080')])
         
         # Add GitHub link
         self.footer_frame = ttk.Frame(self.main_container)
