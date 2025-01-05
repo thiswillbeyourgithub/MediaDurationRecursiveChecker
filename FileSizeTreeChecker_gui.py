@@ -67,6 +67,8 @@ from pathlib import Path
 from typing import List, Optional
 import threading
 import os
+import warnings
+from moviepy.video.io.VideoFileClip import VideoFileClip
 try:
     from tqdm import tqdm
     has_tqdm = True
@@ -83,9 +85,6 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         base_path: Base path for relative path calculation
         verbose: Print detailed processing information
     """
-    # Using moviepy to get duration
-    import warnings
-    from moviepy.video.io.VideoFileClip import VideoFileClip
     try:
         # Suppress warnings unless verbose mode
         if not verbose:
