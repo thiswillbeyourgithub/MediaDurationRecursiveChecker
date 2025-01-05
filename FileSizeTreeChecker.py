@@ -390,8 +390,8 @@ class MediaDurationApp:
                     estimated_total = (total_size / processed_size) * current_duration
                 if self.cancel_requested:
                     self.log_message("\nProcessing cancelled by user")
-                    self.log_message(f"Duration so far: {current_duration//3600}h {(current_duration%3600)//60}m")
-                    self.log_message(f"Estimated total duration: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m")
+                    self.log_message(f"Duration of all files seen so far: {current_duration//3600}h {(current_duration%3600)//60}m")
+                    self.log_message(f"Estimated duration for all the files (seen and unseen): {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m")
                     break
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
@@ -409,7 +409,7 @@ class MediaDurationApp:
                     estimated_total = (total_size / processed_size) * current_duration
                     percent_done = (i+1)/len(media_files)*100
                     progress_msg = f"[{i+1}/{len(media_files)} ({percent_done:.1f}%)] Current: {current_duration//3600}h {(current_duration%3600)//60}m | " \
-                                 f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+                                 f"Estimated total for all files: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
                     
                     if i % 10 == 0:  # Update progress every 10 files
                         self.queue_message(progress_msg)
