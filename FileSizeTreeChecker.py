@@ -217,9 +217,16 @@ class MediaDurationApp:
         self.progress_text.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
         
+        # Configure grid weights for progress frame
+        self.progress_frame.grid_rowconfigure(0, weight=1)
+        self.progress_frame.grid_columnconfigure(0, weight=1)
+        
         # Configure grid weights for main container
         self.main_container.grid_rowconfigure(3, weight=1)  # Progress area gets extra space
         self.main_container.grid_columnconfigure(0, weight=1)
+        
+        # Make text widget expand to fill space
+        self.progress_text.config(wrap="none")
         
         # Control buttons
         self.button_frame = ttk.Frame(self.main_container)
