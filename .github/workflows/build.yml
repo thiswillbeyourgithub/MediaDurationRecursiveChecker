@@ -33,7 +33,7 @@ jobs:
 
       - name: Compile script with PyInstaller
         run: |
-          pyinstaller --onefile --name FilesizeTreeChecker FilesizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
+          pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
