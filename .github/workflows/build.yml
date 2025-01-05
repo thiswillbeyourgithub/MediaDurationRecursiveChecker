@@ -30,15 +30,15 @@ jobs:
           python -m pip install --upgrade pip
           # install a working numpy to avoid issues with numpy 2.0
           pip install numpy==1.25.0
-          pip install -U pyinstaller
+          pip install pyinstaller
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # On macOS, install universal2 versions of dependencies
             export ARCHFLAGS="-arch x86_64 -arch arm64"
-            pip install -U moviepy --no-binary :all:
-            pip install -U pyperclip
+            pip install moviepy --no-binary :all:
+            pip install pyperclip
           else
-            pip install -U moviepy
-            pip install -U pyperclip
+            pip install moviepy
+            pip install pyperclip
           fi
 
       - name: Compile script with PyInstaller
