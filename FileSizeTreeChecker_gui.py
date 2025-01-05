@@ -285,12 +285,11 @@ class MediaDurationApp:
             self.output_entry.config(state="disabled")
             self.output_browse_button.config(state="disabled")
             
-    def log_message(self, message):
-        self.progress_text.config(state="normal")
-        self.progress_text.insert("end", message + "\n")
-        self.progress_text.see("end")
-        self.progress_text.config(state="disabled")
-        self.root.update_idletasks()
+    def __init__(self, root):
+        self.root = root
+        # Add message queue and update timer
+        self.message_queue = []
+        self.update_timer = None
         
     def start_processing(self):
         folder = self.folder_path.get()
@@ -340,9 +339,9 @@ class MediaDurationApp:
             # Get all media files
             media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
             if self.verbose_mode.get():
-                self.log_message("Files to process:")
-                for f in media_files:
-                    self.log_message(f"  {f.name}")
+                # Batch file list display
+                file_list = "\n".join(f"  {f.name}" for f in media_files)
+                self.log_message("Files to process:\n" + file_list)
             
             random.shuffle(media_files)
             
@@ -397,7 +396,7 @@ class MediaDurationApp:
                                  f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
                     
                     if i % 10 == 0:  # Update progress every 10 files
-                        self.log_message(progress_msg)
+                        self.queue_message(progress_msg)
             
             self.log_message(f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m")
             
