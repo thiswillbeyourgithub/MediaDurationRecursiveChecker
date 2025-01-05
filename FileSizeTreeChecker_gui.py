@@ -122,6 +122,9 @@ class MediaDurationApp:
         self.folder_path = tk.StringVar()
         self.folder_entry = ttk.Entry(self.folder_frame, textvariable=self.folder_path)
         self.folder_entry.pack(side="left", fill="x", expand=True, padx=5, pady=5)
+        # Add select-all shortcut
+        self.folder_entry.bind("<Control-a>", lambda e: self.folder_entry.selection_range(0, 'end'))
+        self.folder_entry.bind("<Command-a>", lambda e: self.folder_entry.selection_range(0, 'end'))
         
         self.browse_button = ttk.Button(self.folder_frame, text="Browse", command=self.select_folder)
         self.browse_button.pack(side="right", padx=5, pady=5)
@@ -142,6 +145,9 @@ class MediaDurationApp:
         self.output_path = tk.StringVar()
         self.output_entry = ttk.Entry(self.output_frame, textvariable=self.output_path, state="disabled")
         self.output_entry.pack(side="left", fill="x", expand=True, padx=(0,5))
+        # Add select-all shortcut
+        self.output_entry.bind("<Control-a>", lambda e: self.output_entry.selection_range(0, 'end'))
+        self.output_entry.bind("<Command-a>", lambda e: self.output_entry.selection_range(0, 'end'))
         
         self.output_browse_button = ttk.Button(self.output_frame, text="Browse", 
                                              command=self.select_output_file, state="disabled")
