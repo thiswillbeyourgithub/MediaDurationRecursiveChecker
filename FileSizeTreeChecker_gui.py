@@ -285,11 +285,30 @@ class MediaDurationApp:
             self.output_entry.config(state="disabled")
             self.output_browse_button.config(state="disabled")
             
-    def __init__(self, root):
-        self.root = root
-        # Add message queue and update timer
-        self.message_queue = []
+    def queue_message(self, message):
+        """Add message to queue and schedule update"""
+        self.message_queue.append(message)
+        if not self.update_timer:
+            self.update_timer = self.root.after(100, self.process_message_queue)
+
+    def process_message_queue(self):
+        """Process all queued messages at once"""
+        if self.message_queue:
+            self.progress_text.config(state="normal")
+            # Join all messages with newlines
+            text = "\n".join(self.message_queue) + "\n"
+            self.progress_text.insert("end", text)
+            self.progress_text.see("end")
+            self.progress_text.config(state="disabled")
+            self.message_queue.clear()
         self.update_timer = None
+
+    def log_message(self, message):
+        """Immediate logging for important messages"""
+        self.progress_text.config(state="normal")
+        self.progress_text.insert("end", message + "\n")
+        self.progress_text.see("end")
+        self.progress_text.config(state="disabled")
         
     def start_processing(self):
         folder = self.folder_path.get()
