@@ -48,7 +48,7 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # On macOS, build universal2 binary that works on both Intel and Apple Silicon
-            pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture universal2 --clean
+            pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --clean
           else
             # On other platforms, use default architecture
             pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --clean
