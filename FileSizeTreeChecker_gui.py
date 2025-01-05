@@ -22,7 +22,6 @@ Features:
 
 Dependencies:
 - moviepy: For media file duration extraction
-- tqdm: Optional for progress bars (if available)
 
 Usage:
 1. Launch the application
@@ -54,7 +53,6 @@ The application will skip these files and continue processing others.
 # requires-python = ">=3.8"
 # dependencies = [
 #     "moviepy>=1.0.0",
-#     "tqdm>=4.0.0",
 # ]
 # ///
 
@@ -70,11 +68,6 @@ import threading
 import os
 import warnings
 from moviepy.video.io.VideoFileClip import VideoFileClip
-try:
-    from tqdm import tqdm
-    has_tqdm = True
-except ImportError:
-    has_tqdm = False
 
 MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.avi', '.mkv', '.mov', '.wav', '.flac'}
 
