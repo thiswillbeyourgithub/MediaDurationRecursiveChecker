@@ -52,6 +52,7 @@ The application will skip these files and continue processing others.
 # /// script
 # requires-python = ">=3.8"
 # dependencies = [
+#     "numpy>=1.25.0",
 #     "moviepy>=1.0.0",
 #     "pyperclip>=1.9.0",
 # ]
