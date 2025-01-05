@@ -25,6 +25,7 @@ jobs:
           python-version: '3.11.7'
 
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install -U pyinstaller
@@ -39,6 +40,7 @@ jobs:
           fi
 
       - name: Compile script with PyInstaller
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # On macOS, build universal2 binary that works on both Intel and Apple Silicon
