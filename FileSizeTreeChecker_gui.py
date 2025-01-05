@@ -194,6 +194,10 @@ class MediaDurationApp:
         self.processing_thread = None
         self.cancel_requested = False
         
+        # Message queue for progress updates
+        self.message_queue = []
+        self.update_timer = None
+        
         # Configure styles
         style = ttk.Style()
         style.configure('Accent.TButton', 
