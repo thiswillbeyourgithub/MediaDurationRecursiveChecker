@@ -110,10 +110,15 @@ class MediaDurationApp:
         
         # Try to load last used path
         last_path = self._load_last_path()
+        self.folder_path = tk.StringVar(value=last_path if last_path else "")
+        
+        # Set initial window position based on last path
         if last_path:
-            self.folder_path = tk.StringVar(value=last_path)
+            self.root.geometry("500x300+100+100")  # Default position
         else:
-            self.folder_path = tk.StringVar()
+            # Center window if no last path
+            self.root.geometry("500x300")
+            self.root.eval('tk::PlaceWindow . center')
         
         # Folder selection
         self.folder_frame = ttk.LabelFrame(root, text="Select Folder")
