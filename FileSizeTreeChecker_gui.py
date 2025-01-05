@@ -322,8 +322,12 @@ class MediaDurationApp:
             # Process files
             current_duration = 0
             processed_size = 0
+            estimated_total = 0  # Initialize with 0
             
             for i, file in enumerate(media_files):
+                # Calculate estimated total duration
+                if processed_size > 0:
+                    estimated_total = (total_size / processed_size) * current_duration
                 if self.cancel_requested:
                     self.log_message("\nProcessing cancelled by user")
                     self.log_message(f"Duration so far: {current_duration//3600}h {(current_duration%3600)//60}m")
