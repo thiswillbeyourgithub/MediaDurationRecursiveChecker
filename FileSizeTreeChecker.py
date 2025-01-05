@@ -102,7 +102,8 @@ class MediaDurationApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Media Duration Calculator")
-        self.root.geometry("500x300")
+        self.root.geometry("500x400")
+        self.root.minsize(400, 300)  # Set minimum window size
         
         # Try to load last used path
         last_path = self._load_last_path()
@@ -116,9 +117,13 @@ class MediaDurationApp:
             self.root.geometry("500x300")
             self.root.eval('tk::PlaceWindow . center')
         
+        # Main container using grid
+        self.main_container = ttk.Frame(root)
+        self.main_container.pack(fill="both", expand=True, padx=5, pady=5)
+        
         # Documentation section
-        self.doc_frame = ttk.Frame(root)
-        self.doc_frame.pack(fill="x", padx=10, pady=5)
+        self.doc_frame = ttk.Frame(self.main_container)
+        self.doc_frame.grid(row=0, column=0, sticky="ew", padx=5, pady=2)
         
         # Clickable label to show/hide docs
         self.doc_label = ttk.Label(
@@ -133,7 +138,7 @@ class MediaDurationApp:
         # Text widget for documentation
         self.doc_text = tk.Text(
             self.doc_frame, 
-            height=10, 
+            height=5,  # Reduced initial height
             wrap="word", 
             state="disabled",
             padx=5,
@@ -149,8 +154,8 @@ class MediaDurationApp:
         self.docs_visible = False
         
         # Folder selection
-        self.folder_frame = ttk.LabelFrame(root, text="Select Folder")
-        self.folder_frame.pack(fill="x", padx=10, pady=5)
+        self.folder_frame = ttk.LabelFrame(self.main_container, text="Select Folder")
+        self.folder_frame.grid(row=1, column=0, sticky="ew", padx=5, pady=2)
         
         self.folder_path = tk.StringVar()
         self.folder_entry = ttk.Entry(self.folder_frame, textvariable=self.folder_path)
@@ -167,8 +172,8 @@ class MediaDurationApp:
         self.browse_button.pack(side="right", padx=5, pady=5)
         
         # Options
-        self.options_frame = ttk.LabelFrame(root, text="Options")
-        self.options_frame.pack(fill="x", padx=10, pady=5)
+        self.options_frame = ttk.LabelFrame(self.main_container, text="Options")
+        self.options_frame.grid(row=2, column=0, sticky="ew", padx=5, pady=2)
         
         # Output path
         self.output_frame = ttk.Frame(self.options_frame)
@@ -200,15 +205,25 @@ class MediaDurationApp:
         self.verbose_check.pack(anchor="w", padx=5, pady=2)
         
         # Progress
-        self.progress_frame = ttk.LabelFrame(root, text="Progress")
-        self.progress_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
+        self.progress_frame.grid(row=3, column=0, sticky="nsew", padx=5, pady=2)
         
-        self.progress_text = tk.Text(self.progress_frame, height=10, state="disabled")
-        self.progress_text.pack(fill="both", expand=True, padx=5, pady=5)
+        # Add scrollbar to progress text
+        self.progress_text = tk.Text(self.progress_frame, height=8, state="disabled")
+        scrollbar = ttk.Scrollbar(self.progress_frame, command=self.progress_text.yview)
+        self.progress_text.configure(yscrollcommand=scrollbar.set)
+        
+        # Grid layout for progress area
+        self.progress_text.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        
+        # Configure grid weights for main container
+        self.main_container.grid_rowconfigure(3, weight=1)  # Progress area gets extra space
+        self.main_container.grid_columnconfigure(0, weight=1)
         
         # Control buttons
-        self.button_frame = ttk.Frame(root)
-        self.button_frame.pack(pady=20, fill='x', padx=50)
+        self.button_frame = ttk.Frame(self.main_container)
+        self.button_frame.grid(row=4, column=0, sticky="ew", padx=5, pady=5)
         
         self.start_button = ttk.Button(
             self.button_frame, 
@@ -243,8 +258,8 @@ class MediaDurationApp:
                        background='#0078d7')
         
         # Add GitHub link
-        self.footer_frame = ttk.Frame(root)
-        self.footer_frame.pack(fill='x', padx=10, pady=5)
+        self.footer_frame = ttk.Frame(self.main_container)
+        self.footer_frame.grid(row=5, column=0, sticky="ew", padx=5, pady=2)
         
         self.github_link = ttk.Label(
             self.footer_frame,
