@@ -1,27 +1,29 @@
 #!/usr/bin/env python3
-"""Media Duration Calculator GUI Application
+"""FileSizeTreeChecker - Media Duration and Size Calculator
 
 Repository: https://github.com/thiswillbeyourgithub/FileSizeTreeChecker
 Author: thiswillbeyourgithub
 License: GPLv3
 
-This application provides a graphical interface for calculating the total duration
-of media files in a directory tree. It supports various media formats and provides
-detailed progress reporting and results saving.
+This application calculates the total duration and size of media files in a directory tree.
+It's particularly useful for estimating total duration of video/audio collections.
 
-Features:
-- Supports multiple media formats: MP3, MP4, AVI, MKV, MOV, WAV, FLAC
-- Recursively scans directories for media files
-- Calculates total duration in hours and minutes
-- Estimates total processing time during calculation
-- Provides verbose output mode for detailed processing information
-- Saves results to JSON file with duration and size for each file
-- Progress reporting with current and estimated total duration
-- Threaded processing to keep UI responsive
-- Cross-platform support (Windows, macOS, Linux)
+Key Features:
+- Supports common media formats: .mp3, .mp4, .avi, .mkv, .mov, .wav, .flac
+- Recursively scans directories
+- Excludes hidden files (those starting with '.')
+- Provides:
+  - Total number of media files
+  - Total size in GB
+  - Total duration of all files
+  - Real-time duration estimation
+  - Verbose output with individual file durations
+  - Results optionally saved to JSON file
 
-Dependencies:
-- moviepy: For media file duration extraction
+Requirements:
+- Python 3.8+
+- moviepy (for media duration extraction)
+- pyperclip (for clipboard integration)
 
 Usage:
 1. Launch the application
@@ -31,11 +33,11 @@ Usage:
 5. View progress in the output window
 6. Results will be displayed and optionally saved to JSON
 
-The application handles large media collections efficiently by:
-- Processing files in random order to prevent media type bias
+The application handles large collections efficiently by:
+- Processing files in random order for better time estimates
 - Providing real-time progress updates
 - Using threading to maintain responsive UI
-- Implementing error handling for problematic files
+- Gracefully handling problematic files
 
 JSON Output Format:
 {
@@ -48,6 +50,9 @@ JSON Output Format:
 
 Note: Some media files may not report accurate durations due to encoding issues.
 The application will skip these files and continue processing others.
+
+For more information, see the README at:
+https://github.com/thiswillbeyourgithub/FileSizeTreeChecker
 """
 # /// script
 # requires-python = ">=3.8"
