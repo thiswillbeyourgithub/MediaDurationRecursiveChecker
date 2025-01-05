@@ -18,6 +18,7 @@ This Python script calculates the total duration of media files (video/audio) in
 
 - Python 3.6+ (only tested on 3.11)
 - `moviepy` (for media duration extraction)
+- `pyclip` (to handle copying and pasting the path)
 
 ## Installation
 

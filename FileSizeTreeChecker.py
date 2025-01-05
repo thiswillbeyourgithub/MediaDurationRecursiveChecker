@@ -53,6 +53,7 @@ The application will skip these files and continue processing others.
 # requires-python = ">=3.8"
 # dependencies = [
 #     "moviepy>=1.0.0",
+#     "pyclip>=0.7.0",
 # ]
 # ///
 
