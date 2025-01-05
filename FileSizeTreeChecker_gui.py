@@ -135,7 +135,7 @@ class MediaDurationApp:
         self.output_frame = ttk.Frame(self.options_frame)
         self.output_frame.pack(fill="x", padx=5, pady=2)
         
-        self.save_json = tk.BooleanVar(value=True)
+        self.save_json = tk.BooleanVar(value=False)
         self.json_check = ttk.Checkbutton(self.output_frame, text="Save results to JSON", 
                                         variable=self.save_json, command=self.toggle_output_path)
         self.json_check.pack(side="left", padx=(0,5))
