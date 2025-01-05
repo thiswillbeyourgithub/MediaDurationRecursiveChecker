@@ -191,6 +191,19 @@ class MediaDurationApp:
                        foreground='white',
                        background='#0078d7')
         
+        # Add GitHub link
+        self.footer_frame = ttk.Frame(root)
+        self.footer_frame.pack(fill='x', padx=10, pady=5)
+        
+        self.github_link = ttk.Label(
+            self.footer_frame,
+            text="GitHub Repository",
+            foreground="blue",
+            cursor="hand2"
+        )
+        self.github_link.pack(side="right")
+        self.github_link.bind("<Button-1>", lambda e: self.open_github())
+        
     def _get_last_path_file(self) -> Path:
         """Get the path to the last path file in system temp directory."""
         import tempfile
@@ -360,6 +373,11 @@ class MediaDurationApp:
             self.cancel_requested = True
             self.log_message("\nCancelling... Please wait for current file to finish.")
             self.cancel_button.config(state="disabled")
+            
+    def open_github(self):
+        """Open the GitHub repository in the default web browser."""
+        import webbrowser
+        webbrowser.open("https://github.com/thiswillbeyourgithub/FileSizeTreeChecker")
 
 if __name__ == '__main__':
     root = tk.Tk()
