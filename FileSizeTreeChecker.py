@@ -104,6 +104,12 @@ def main() -> None:
     outpath = args.outpath
     verbose = args.verbose
     path = Path(filepath)
+    
+    # Check if path exists
+    if not path.exists():
+        print(f"Error: The path '{filepath}' does not exist")
+        exit(1)
+    
     results = {}
     
     # Get all media files
