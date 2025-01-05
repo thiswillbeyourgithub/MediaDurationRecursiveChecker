@@ -156,7 +156,7 @@ class MediaDurationApp:
         self.output_entry.bind("<Control-c>", lambda e: pyperclip.copy(self.output_entry.get()))
         self.output_entry.bind("<Command-c>", lambda e: pyperclip.copy(self.output_entry.get()))
         self.output_entry.bind("<Control-v>", lambda e: self.output_entry.insert(0, pyperclip.paste()))
-        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyperclip.paste()))
+        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyclip.paste()))
         
         self.output_browse_button = ttk.Button(self.output_frame, text="Browse", 
                                              command=self.select_output_file, state="disabled")
@@ -377,19 +377,6 @@ class MediaDurationApp:
             total_size = sum(f.stat().st_size for f in media_files)
             total_size_gb = total_size / (1024 ** 3)
     
-            # Get all media files
-            media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
-            if self.verbose_mode.get():
-                self.log_message("Files to process:")
-                for f in media_files:
-                    self.log_message(f"  {f.name}")
-            
-            random.shuffle(media_files)
-            
-            # Calculate total size
-            total_size = sum(f.stat().st_size for f in media_files)
-            total_size_gb = total_size / (1024 ** 3)
-            
             self.log_message(f"Found {len(media_files)} media files ({total_size_gb:.2f} GB)")
             
             # Process files
