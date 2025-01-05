@@ -28,8 +28,15 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -U pyinstaller
-          pip install -U moviepy
-          pip install -U pyclip
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            # On macOS, install universal2 versions of dependencies
+            export ARCHFLAGS="-arch x86_64 -arch arm64"
+            pip install -U moviepy --no-binary :all:
+            pip install -U pyclip --no-binary :all:
+          else
+            pip install -U moviepy
+            pip install -U pyclip
+          fi
 
       - name: Compile script with PyInstaller
         run: |
