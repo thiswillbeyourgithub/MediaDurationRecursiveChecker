@@ -148,14 +148,29 @@ class MediaDurationApp:
         self.progress_text = tk.Text(self.progress_frame, height=10, state="disabled")
         self.progress_text.pack(fill="both", expand=True, padx=5, pady=5)
         
-        # Start button
+        # Control buttons
+        self.button_frame = ttk.Frame(root)
+        self.button_frame.pack(pady=20, fill='x', padx=50)
+        
         self.start_button = ttk.Button(
-            root, 
+            self.button_frame, 
             text="Start Processing", 
             command=self.start_processing,
             style='Accent.TButton'
         )
-        self.start_button.pack(pady=20, fill='x', padx=50)
+        self.start_button.pack(side="left", expand=True, fill="x")
+        
+        self.cancel_button = ttk.Button(
+            self.button_frame,
+            text="Cancel",
+            command=self.cancel_processing,
+            state="disabled"
+        )
+        self.cancel_button.pack(side="right", expand=True, fill="x")
+        
+        # Thread control
+        self.processing_thread = None
+        self.cancel_requested = False
         
         # Configure styles
         style = ttk.Style()
@@ -204,17 +219,21 @@ class MediaDurationApp:
             messagebox.showerror("Error", "Please select a folder first")
             return
             
+        # Reset cancel flag
+        self.cancel_requested = False
+        
         # Disable UI during processing
         self.browse_button.config(state="disabled")
         self.start_button.config(state="disabled")
+        self.cancel_button.config(state="normal")
         
         # Run processing in separate thread
-        processing_thread = threading.Thread(
+        self.processing_thread = threading.Thread(
             target=self.process_folder,
             args=(folder,),
             daemon=True
         )
-        processing_thread.start()
+        self.processing_thread.start()
         
     def process_folder(self, folder):
         try:
@@ -254,6 +273,9 @@ class MediaDurationApp:
             processed_size = 0
             
             for i, file in enumerate(media_files):
+                if self.cancel_requested:
+                    self.log_message("\nProcessing cancelled by user")
+                    break
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
                 current_duration += duration
@@ -291,6 +313,15 @@ class MediaDurationApp:
             # Re-enable UI
             self.browse_button.config(state="normal")
             self.start_button.config(state="normal")
+            self.cancel_button.config(state="disabled")
+            self.processing_thread = None
+
+    def cancel_processing(self):
+        """Cancel the current processing operation."""
+        if self.processing_thread and self.processing_thread.is_alive():
+            self.cancel_requested = True
+            self.log_message("\nCancelling... Please wait for current file to finish.")
+            self.cancel_button.config(state="disabled")
 
 if __name__ == '__main__':
     root = tk.Tk()
