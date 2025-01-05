@@ -39,13 +39,7 @@ jobs:
           pip install numpy==1.25.0
           pip install pyperclip
           pip install pyinstaller
-          if [[ "${{ matrix.os }}" == "macos-14" ]]; then
-            pip install moviepy --no-binary :all:
-          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
-            pip install moviepy --no-binary :all:
-          else
-            pip install moviepy
-          fi
+          pip install moviepy
 
       - name: Compile script with PyInstaller
         shell: bash
