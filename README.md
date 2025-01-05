@@ -20,47 +20,40 @@ This Python script calculates the total duration of media files (video/audio) in
 - `moviepy` (for media duration extraction)
 - `pyclip` (to handle copying and pasting the path)
 
-## Installation
+## Installation and Usage
 
-Install required Python packages:
+You have three options to run FileSizeTreeChecker:
+
+### 1. Run from Source (GUI)
+1. Install required Python packages:
 ```bash
-pip install moviepy
+pip install moviepy pyclip
 ```
-
-Ensure `ffmpeg` is installed on your system.
-
-## Building with PyInstaller
-
-To create a standalone executable on macOS:
-
+2. Ensure `ffmpeg` is installed on your system
+3. Run the script:
 ```bash
-pip install pyinstaller moviepy
-pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console --hidden-import=imageio_ffmpeg
+python FileSizeTreeChecker.py
 ```
+4. Use the graphical interface to select folders and process files
 
-This will create a single executable file in the `dist` directory.
+### 2. Use Pre-built Binaries (Recommended)
+- Download the latest release from GitHub
+- No installation required - just run the executable
+- Binaries are built automatically using GitHub Actions
 
-## Usage
-
-Basic usage:
+### 3. Build Your Own Executable
+If you prefer to build it yourself:
+1. Install PyInstaller:
 ```bash
-python filesize_check.py /path/to/media/files
+pip install pyinstaller
 ```
-
-With custom output file:
+2. Build the executable:
 ```bash
-python filesize_check.py /path/to/media/files --outpath custom_output.json
+pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --noconsole --hidden-import=imageio_ffmpeg
 ```
+3. The executable will be in the `dist` directory
 
-Verbose mode (shows individual file processing):
-```bash
-python filesize_check.py /path/to/media/files --verbose
-```
-
-All options:
-```bash
-python filesize_check.py --help
-```
+Note: The GitHub Actions workflow automatically builds binaries for Windows, macOS and Linux using this method.
 
 ## Output Example
 
