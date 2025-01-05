@@ -18,7 +18,7 @@ This Python script calculates the total duration of media files (video/audio) in
 
 - Python 3.6+ (only tested on 3.11)
 - `moviepy` (for media duration extraction)
-- `pyclip` (to handle copying and pasting the path)
+- `pyperclip` (to handle copying and pasting the path)
 
 ## Installation and Usage
 
@@ -27,7 +27,7 @@ You have three options to run FileSizeTreeChecker:
 ### 1. Run from Source (GUI)
 1. Install required Python packages:
 ```bash
-pip install moviepy pyclip
+pip install moviepy pyperclip
 ```
 2. Ensure `ffmpeg` is installed on your system
 3. Run the script:

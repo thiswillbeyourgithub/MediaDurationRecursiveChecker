@@ -53,13 +53,13 @@ The application will skip these files and continue processing others.
 # requires-python = ">=3.8"
 # dependencies = [
 #     "moviepy>=1.0.0",
-#     "pyclip>=0.7.0",
+#     "pyperclip>=1.9.0",
 # ]
 # ///
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-import pyclip
+import pyperclip
 from pprint import pprint
 import json
 import random
@@ -125,10 +125,10 @@ class MediaDurationApp:
         # Add clipboard and select-all shortcuts
         self.folder_entry.bind("<Control-a>", lambda e: self.folder_entry.selection_range(0, 'end'))
         self.folder_entry.bind("<Command-a>", lambda e: self.folder_entry.selection_range(0, 'end'))
-        self.folder_entry.bind("<Control-c>", lambda e: pyclip.copy(self.folder_entry.get()))
-        self.folder_entry.bind("<Command-c>", lambda e: pyclip.copy(self.folder_entry.get()))
-        self.folder_entry.bind("<Control-v>", lambda e: self.folder_entry.insert(0, pyclip.paste()))
-        self.folder_entry.bind("<Command-v>", lambda e: self.folder_entry.insert(0, pyclip.paste()))
+        self.folder_entry.bind("<Control-c>", lambda e: pyperclip.copy(self.folder_entry.get()))
+        self.folder_entry.bind("<Command-c>", lambda e: pyperclip.copy(self.folder_entry.get()))
+        self.folder_entry.bind("<Control-v>", lambda e: self.folder_entry.insert(0, pyperclip.paste()))
+        self.folder_entry.bind("<Command-v>", lambda e: self.folder_entry.insert(0, pyperclip.paste()))
         
         self.browse_button = ttk.Button(self.folder_frame, text="Browse", command=self.select_folder)
         self.browse_button.pack(side="right", padx=5, pady=5)
@@ -152,10 +152,10 @@ class MediaDurationApp:
         # Add clipboard and select-all shortcuts
         self.output_entry.bind("<Control-a>", lambda e: self.output_entry.selection_range(0, 'end'))
         self.output_entry.bind("<Command-a>", lambda e: self.output_entry.selection_range(0, 'end'))
-        self.output_entry.bind("<Control-c>", lambda e: pyclip.copy(self.output_entry.get()))
-        self.output_entry.bind("<Command-c>", lambda e: pyclip.copy(self.output_entry.get()))
-        self.output_entry.bind("<Control-v>", lambda e: self.output_entry.insert(0, pyclip.paste()))
-        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyclip.paste()))
+        self.output_entry.bind("<Control-c>", lambda e: pyperclip.copy(self.output_entry.get()))
+        self.output_entry.bind("<Command-c>", lambda e: pyperclip.copy(self.output_entry.get()))
+        self.output_entry.bind("<Control-v>", lambda e: self.output_entry.insert(0, pyperclip.paste()))
+        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyperclip.paste()))
         
         self.output_browse_button = ttk.Button(self.output_frame, text="Browse", 
                                              command=self.select_output_file, state="disabled")
