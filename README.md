@@ -1,4 +1,4 @@
-# Media Duration Calculator
+# FileSizeTreeChecker
 
 This Python script calculates the total duration of media files (video/audio) in a directory and estimates the total processing time. It was created to help estimate the total duration of daily/rush footage on a hard drive.
 
@@ -40,7 +40,7 @@ To create a standalone executable on macOS:
 
 ```bash
 pip install pyinstaller moviepy
-pyinstaller --onefile --name FilesizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console --hidden-import=imageio_ffmpeg
+pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean --console --hidden-import=imageio_ffmpeg
 ```
 
 This will create a single executable file in the `dist` directory.
