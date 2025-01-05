@@ -410,6 +410,16 @@ class MediaDurationApp:
         webbrowser.open("https://github.com/thiswillbeyourgithub/FileSizeTreeChecker")
 
 if __name__ == '__main__':
-    root = tk.Tk()
-    app = MediaDurationApp(root)
-    root.mainloop()
+    try:
+        root = tk.Tk()
+        app = MediaDurationApp(root)
+        root.mainloop()
+    except KeyboardInterrupt:
+        print("\nKeyboard interrupt received. Exiting gracefully...")
+        try:
+            if app.processing_thread and app.processing_thread.is_alive():
+                app.cancel_processing()
+                app.processing_thread.join(timeout=2)
+        except Exception:
+            pass
+        root.destroy()
