@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Media Duration Calculator GUI Application
 
+Repository: https://github.com/thiswillbeyourgithub/FileSizeTreeChecker
+Author: thiswillbeyourgithub
+License: GPLv3
+
 This application provides a graphical interface for calculating the total duration
 of media files in a directory tree. It supports various media formats and provides
 detailed progress reporting and results saving.

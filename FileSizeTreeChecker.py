@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Media Duration and Size Analyzer
 
+Repository: https://github.com/thiswillbeyourgithub/FileSizeTreeChecker
+Author: thiswillbeyourgithub
+License: GPLv3
+
 This script calculates the total duration and size of media files in a directory tree.
 It supports common media formats including MP3, MP4, AVI, MKV, MOV, WAV, and FLAC.
 
