@@ -90,7 +90,5 @@ Le fichier JSON de sortie contient :
 
 ## Notes
 
-- Le script utilise `ffprobe` pour obtenir les durées des médias
-- Les fichiers cachés (commençant par '.') sont ignorés
 - Les fichiers sont traités dans un ordre aléatoire pour fournir de meilleures estimations de temps
 - Le script gère les erreurs avec élégance, en sautant les fichiers qu'il ne peut pas traiter

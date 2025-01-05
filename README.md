@@ -90,7 +90,5 @@ The output JSON file contains:
 
 ## Notes
 
-- The script uses `ffprobe` to get media durations
-- Hidden files (starting with '.') are ignored
 - Files are processed in random order to provide better time estimates
 - The script handles errors gracefully, skipping files it can't process
