@@ -424,7 +424,8 @@ class MediaDurationApp:
                 # Calculate estimated total duration
                 if processed_size > 0:
                     estimated_total = (total_size / processed_size) * current_duration
-                    progress_msg = f"[{i+1}/{len(media_files)}] Current: {current_duration//3600}h {(current_duration%3600)//60}m | " \
+                    percent_done = (i+1)/len(media_files)*100
+                    progress_msg = f"[{i+1}/{len(media_files)} ({percent_done:.1f}%)] Current: {current_duration//3600}h {(current_duration%3600)//60}m | " \
                                  f"Estimated total: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
                     
                     if i % 10 == 0:  # Update progress every 10 files
