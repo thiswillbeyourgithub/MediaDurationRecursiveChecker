@@ -180,10 +180,17 @@ class MediaDurationApp:
                        foreground='white',
                        background='#0078d7')
         
+    def _get_last_path_file(self) -> Path:
+        """Get the path to the last path file in system temp directory."""
+        import tempfile
+        temp_dir = Path(tempfile.gettempdir())
+        return temp_dir / "FileSizeTreeChecker_latest_path.txt"
+
     def _save_last_path(self, path: str) -> None:
         """Save the last selected path to a temporary file."""
         try:
-            with open("FileSizeTreeChecker_latest_path.txt", "w") as f:
+            last_path_file = self._get_last_path_file()
+            with open(last_path_file, "w") as f:
                 f.write(path)
         except Exception:
             pass  # Silently ignore any errors
@@ -191,8 +198,9 @@ class MediaDurationApp:
     def _load_last_path(self) -> Optional[str]:
         """Load the last selected path from temporary file if it exists."""
         try:
-            if os.path.exists("FileSizeTreeChecker_latest_path.txt"):
-                with open("FileSizeTreeChecker_latest_path.txt", "r") as f:
+            last_path_file = self._get_last_path_file()
+            if last_path_file.exists():
+                with open(last_path_file, "r") as f:
                     path = f.read().strip()
                     if path and os.path.exists(path):
                         return path
