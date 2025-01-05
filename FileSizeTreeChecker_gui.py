@@ -131,10 +131,22 @@ class MediaDurationApp:
         self.options_frame = ttk.LabelFrame(root, text="Options")
         self.options_frame.pack(fill="x", padx=10, pady=5)
         
+        # Output path
+        self.output_frame = ttk.Frame(self.options_frame)
+        self.output_frame.pack(fill="x", padx=5, pady=2)
+        
         self.save_json = tk.BooleanVar(value=True)
-        self.json_check = ttk.Checkbutton(self.options_frame, text="Save results to JSON", 
-                                        variable=self.save_json)
-        self.json_check.pack(anchor="w", padx=5, pady=2)
+        self.json_check = ttk.Checkbutton(self.output_frame, text="Save results to JSON", 
+                                        variable=self.save_json, command=self.toggle_output_path)
+        self.json_check.pack(side="left", padx=(0,5))
+        
+        self.output_path = tk.StringVar()
+        self.output_entry = ttk.Entry(self.output_frame, textvariable=self.output_path, state="disabled")
+        self.output_entry.pack(side="left", fill="x", expand=True, padx=(0,5))
+        
+        self.output_browse_button = ttk.Button(self.output_frame, text="Browse", 
+                                             command=self.select_output_file, state="disabled")
+        self.output_browse_button.pack(side="right")
         
         self.verbose_mode = tk.BooleanVar(value=False)
         self.verbose_check = ttk.Checkbutton(self.options_frame, text="Verbose output", 
@@ -213,6 +225,25 @@ class MediaDurationApp:
         if folder:
             self.folder_path.set(folder)
             self._save_last_path(folder)
+            # Set default output path
+            self.output_path.set(str(Path(folder) / "media_durations.json"))
+            
+    def select_output_file(self):
+        output_file = filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json")],
+            initialfile="media_durations.json"
+        )
+        if output_file:
+            self.output_path.set(output_file)
+            
+    def toggle_output_path(self):
+        if self.save_json.get():
+            self.output_entry.config(state="normal")
+            self.output_browse_button.config(state="normal")
+        else:
+            self.output_entry.config(state="disabled")
+            self.output_browse_button.config(state="disabled")
             
     def log_message(self, message):
         self.progress_text.config(state="normal")
@@ -308,8 +339,8 @@ class MediaDurationApp:
             
             # Write results to JSON file if enabled
             if self.save_json.get():
-                outpath = path / "media_durations.json"
-                with open(outpath, 'w') as f:
+                outpath = Path(self.output_path.get())
+                with open(outpath, 'w', encoding='utf-8') as f:
                     json.dump(results, f, indent=2)
                 self.log_message(f"Results saved to {outpath}")
             
