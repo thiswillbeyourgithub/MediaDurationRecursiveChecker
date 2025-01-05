@@ -60,6 +60,7 @@ The application will skip these files and continue processing others.
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+import pyclip
 from pprint import pprint
 import json
 import random
@@ -127,9 +128,13 @@ class MediaDurationApp:
         self.folder_path = tk.StringVar()
         self.folder_entry = ttk.Entry(self.folder_frame, textvariable=self.folder_path)
         self.folder_entry.pack(side="left", fill="x", expand=True, padx=5, pady=5)
-        # Add select-all shortcut
+        # Add clipboard and select-all shortcuts
         self.folder_entry.bind("<Control-a>", lambda e: self.folder_entry.selection_range(0, 'end'))
         self.folder_entry.bind("<Command-a>", lambda e: self.folder_entry.selection_range(0, 'end'))
+        self.folder_entry.bind("<Control-c>", lambda e: pyclip.copy(self.folder_entry.get()))
+        self.folder_entry.bind("<Command-c>", lambda e: pyclip.copy(self.folder_entry.get()))
+        self.folder_entry.bind("<Control-v>", lambda e: self.folder_entry.insert(0, pyclip.paste()))
+        self.folder_entry.bind("<Command-v>", lambda e: self.folder_entry.insert(0, pyclip.paste()))
         
         self.browse_button = ttk.Button(self.folder_frame, text="Browse", command=self.select_folder)
         self.browse_button.pack(side="right", padx=5, pady=5)
@@ -150,9 +155,13 @@ class MediaDurationApp:
         self.output_path = tk.StringVar()
         self.output_entry = ttk.Entry(self.output_frame, textvariable=self.output_path, state="disabled")
         self.output_entry.pack(side="left", fill="x", expand=True, padx=(0,5))
-        # Add select-all shortcut
+        # Add clipboard and select-all shortcuts
         self.output_entry.bind("<Control-a>", lambda e: self.output_entry.selection_range(0, 'end'))
         self.output_entry.bind("<Command-a>", lambda e: self.output_entry.selection_range(0, 'end'))
+        self.output_entry.bind("<Control-c>", lambda e: pyclip.copy(self.output_entry.get()))
+        self.output_entry.bind("<Command-c>", lambda e: pyclip.copy(self.output_entry.get()))
+        self.output_entry.bind("<Control-v>", lambda e: self.output_entry.insert(0, pyclip.paste()))
+        self.output_entry.bind("<Command-v>", lambda e: self.output_entry.insert(0, pyclip.paste()))
         
         self.output_browse_button = ttk.Button(self.output_frame, text="Browse", 
                                              command=self.select_output_file, state="disabled")
