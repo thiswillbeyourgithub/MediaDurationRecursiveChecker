@@ -320,7 +320,8 @@ class FileSizeTreeChecker:
         return None
 
     def select_folder(self):
-        folder = filedialog.askdirectory()
+        initialdir = self.folder_path.get() if self.folder_path.get() else None
+        folder = filedialog.askdirectory(initialdir=initialdir)
         if folder:
             if self._is_valid_path(folder):
                 self.folder_path.set(folder)
