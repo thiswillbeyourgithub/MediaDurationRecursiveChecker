@@ -64,5 +64,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: compiled-binary-${{ matrix.os }}  # Unique name per OS
+          name: FileSizeTreeChecker-${{ matrix.os }}  # Unique name per OS
           path: dist/
