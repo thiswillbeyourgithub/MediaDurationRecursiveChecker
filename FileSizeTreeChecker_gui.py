@@ -326,6 +326,8 @@ class MediaDurationApp:
             for i, file in enumerate(media_files):
                 if self.cancel_requested:
                     self.log_message("\nProcessing cancelled by user")
+                    self.log_message(f"Duration so far: {current_duration//3600}h {(current_duration%3600)//60}m")
+                    self.log_message(f"Estimated total duration: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m")
                     break
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
