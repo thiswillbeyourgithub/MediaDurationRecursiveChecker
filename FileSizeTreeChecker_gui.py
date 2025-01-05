@@ -221,9 +221,10 @@ class MediaDurationApp:
         
         self.github_link = ttk.Label(
             self.footer_frame,
-            text="GitHub Repository",
+            text="View source code, documentation, or request features on GitHub",
             foreground="blue",
-            cursor="hand2"
+            cursor="hand2",
+            font=('Helvetica', 9)
         )
         self.github_link.pack(side="right")
         self.github_link.bind("<Button-1>", lambda e: self.open_github())
