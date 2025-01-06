@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-latest, macos-14, macos-13]
+        os: [ubuntu-20.04, windows-latest, macos-14, macos-12]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -31,7 +31,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "macos-14" ]]; then
             # On macOS M1
             export ARCHFLAGS="-arch x86_64 -arch arm64"
-          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-12" ]]; then
             # On macOS with intel cpus
             export ARCHFLAGS="-arch x86_64"
           fi
@@ -47,7 +47,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "macos-14" ]]; then
             # Build Apple Silicon binary
             pyinstaller --onedir --windowed --name FileSizeTreeChecker-arm64 FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture arm64 --clean
-          elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
+          elif [[ "${{ matrix.os }}" == "macos-12" ]]; then
             # Build Intel binary
             pyinstaller --onedir --windowed --name FileSizeTreeChecker-intel FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
           else
