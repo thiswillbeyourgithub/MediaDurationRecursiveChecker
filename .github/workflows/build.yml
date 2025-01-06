@@ -44,15 +44,31 @@ jobs:
       - name: Compile script with PyInstaller
         shell: bash
         run: |
+          # Create hook file for Tkinter
+          echo "from PyInstaller.utils.hooks import collect_data_files" > hook-tkinter.py
+          echo "datas = collect_data_files('tkinter')" >> hook-tkinter.py
+          
           if [[ "${{ matrix.os }}" == "macos-14" ]]; then
             # Build Apple Silicon binary
-            pyinstaller --onedir --windowed --name FileSizeTreeChecker-arm64 FileSizeTreeChecker.py  --target-architecture arm64 --clean
+            pyinstaller --onedir --windowed --name FileSizeTreeChecker-arm64 FileSizeTreeChecker.py \
+              --target-architecture arm64 \
+              --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' \
+              --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' \
+              --hidden-import='tkinter' \
+              --clean
           elif [[ "${{ matrix.os }}" == "macos-12" ]]; then
             # Build Intel binary
-            pyinstaller --onedir --windowed --name FileSizeTreeChecker-intel FileSizeTreeChecker.py --target-architecture x86_64 --clean
+            pyinstaller --onedir --windowed --name FileSizeTreeChecker-intel FileSizeTreeChecker.py \
+              --target-architecture x86_64 \
+              --add-binary='/System/Library/Frameworks/Tk.framework/Tk':'tk' \
+              --add-binary='/System/Library/Frameworks/Tcl.framework/Tcl':'tcl' \
+              --hidden-import='tkinter' \
+              --clean
           else
             # On other platforms, use default architecture
-            pyinstaller --onedir --windowed --name FileSizeTreeChecker FileSizeTreeChecker.py --clean
+            pyinstaller --onedir --windowed --name FileSizeTreeChecker FileSizeTreeChecker.py \
+              --hidden-import='tkinter' \
+              --clean
           fi
 
       - name: Upload artifact
