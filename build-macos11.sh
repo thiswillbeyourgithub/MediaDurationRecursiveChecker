@@ -62,5 +62,3 @@ EOF
 sudo chmod -R 755 dist/FileSizeTreeChecker-macos11.app
 
 echo "Build complete! Check the dist/ directory for your macOS 11 compatible build."
-echo "You may need to codesign the app before distribution:"
-echo "  codesign --deep --force --verify --verbose --sign \"Developer ID Application: Your Name (TEAMID)\" dist/FileSizeTreeChecker-macos11.app"
