@@ -46,13 +46,13 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "macos-14" ]]; then
             # Build Apple Silicon binary
-            pyinstaller --onefile --name FileSizeTreeChecker-arm64 FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture arm64 --clean
+            pyinstaller --onedir --windowed --name FileSizeTreeChecker-arm64 FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture arm64 --clean
           elif [[ "${{ matrix.os }}" == "macos-13" ]]; then
             # Build Intel binary
-            pyinstaller --onefile --name FileSizeTreeChecker-intel FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
+            pyinstaller --onedir --windowed --name FileSizeTreeChecker-intel FileSizeTreeChecker.py --argv-emulation --optimize 2 --target-architecture x86_64 --clean
           else
             # On other platforms, use default architecture
-            pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --clean
+            pyinstaller --onedir --windowed --name FileSizeTreeChecker FileSizeTreeChecker.py --argv-emulation --optimize 2 --clean
           fi
 
       - name: Upload artifact
