@@ -1,6 +1,3 @@
 .aider*
 .env
-*.spec
-dist
-build
 *.json
