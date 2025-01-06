@@ -48,6 +48,12 @@ python FileSizeTreeChecker.py
   - Windows (64-bit)
   - macOS (Intel et Apple Silicon/M1)
   - Linux (64-bit)
+
+**Note pour les utilisateurs macOS :**  
+Si vous obtenez une erreur indiquant que l'application ne peut pas être ouverte car elle provient d'un développeur non identifié, vous pouvez contourner cette restriction avec la commande suivante dans le terminal :
+```bash
+xattr -d com.apple.quarantine /chemin/vers/FileSizeTreeChecker.app
+```
 - Les binaires sont construits automatiquement via GitHub Actions
 
 ### 3. Compiler votre propre exécutable

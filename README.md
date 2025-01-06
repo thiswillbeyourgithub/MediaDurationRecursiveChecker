@@ -50,6 +50,14 @@ python FileSizeTreeChecker.py
   - Linux (64-bit)
 - Binaries are built automatically using GitHub Actions
 
+**Note for macOS users:** If you get a "cannot be opened because the developer cannot be verified" error, this is due to macOS's Gatekeeper security. To fix this:
+1. Open Terminal
+2. Run this command (replace with your actual path):
+```bash
+xattr -d com.apple.quarantine /path/to/FileSizeTreeChecker.app
+```
+3. Try running the app again
+
 ### 3. Build Your Own Executable
 If you prefer to build it yourself:
 1. Install PyInstaller:
