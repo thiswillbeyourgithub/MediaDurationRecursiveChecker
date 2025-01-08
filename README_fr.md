@@ -41,22 +41,7 @@ python FileSizeTreeChecker.py
 ```
 4. Utiliser l'interface graphique pour sélectionner les dossiers et traiter les fichiers
 
-### 2. Utiliser les binaires pré-compilés (Recommandé)
-- Télécharger la dernière version sur GitHub
-- Aucune installation requise - il suffit d'exécuter le fichier
-- Binaires pré-compilés disponibles pour :
-  - Windows (64-bit)
-  - macOS (Intel et Apple Silicon/M1)
-  - Linux (64-bit)
-
-**Note pour les utilisateurs macOS :**  
-Si vous obtenez une erreur indiquant que l'application ne peut pas être ouverte car elle provient d'un développeur non identifié, vous pouvez contourner cette restriction avec la commande suivante dans le terminal :
-```bash
-xattr -d com.apple.quarantine /chemin/vers/FileSizeTreeChecker.app
-```
-- Les binaires sont construits automatiquement via GitHub Actions
-
-### 3. Compiler votre propre exécutable
+### 2. Compiler votre propre exécutable
 Si vous préférez le compiler vous-même :
 1. Installer PyInstaller :
 ```bash
@@ -68,7 +53,10 @@ pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --nocons
 ```
 3. L'exécutable sera dans le répertoire `dist`
 
-Note : Le workflow GitHub Actions compile automatiquement les binaires pour Windows, macOS et Linux en utilisant cette méthode.
+Note : Cela a été testé pour fonctionner sur macOS 11 en utilisant la commande :
+```bash
+sudo pyinstaller --onefile --windowed --name FileSizeTreeChecker FileSizeTreeChecker.py --clean
+```
 
 ## Exemple de sortie
 
