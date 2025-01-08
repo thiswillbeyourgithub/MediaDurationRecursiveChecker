@@ -27,7 +27,7 @@ This Python script calculates the total duration of media files (video/audio) in
 
 ## Installation and Usage
 
-You have three options to run MediaDurationRecursiveChecker:
+You have two options to run MediaDurationRecursiveChecker:
 
 ### 1. Run from Source (GUI)
 1. Install required Python packages:
