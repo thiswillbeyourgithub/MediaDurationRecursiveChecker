@@ -58,6 +58,8 @@ Note: This has been tested to work on macOS 11 when using the command:
 sudo pyinstaller --onefile --windowed --name FileSizeTreeChecker FileSizeTreeChecker.py --clean
 ```
 
+A pre-compiled .app for macOS is available in the 1.0.1 release.
+
 ## Output Example
 
 ```
