@@ -3,6 +3,8 @@
 > Une version anglaise de ce fichier README est disponible : [README.md](README.md)  
 > An English version of this README is available: [README.md](README.md)
 
+![Capture d'écran de l'interface graphique](gui.png)
+
 # MediaDurationRecursiveChecker
 
 Ce script Python calcule la durée totale des fichiers multimédias (vidéo/audio) dans un répertoire et estime le temps total de traitement. Il a été créé pour aider à estimer la durée totale des rushs quotidiens sur un disque dur. Le nom du projet a été changé de FileSizeTreeChecker à MediaDurationRecursiveChecker pour mieux refléter sa fonctionnalité principale.
