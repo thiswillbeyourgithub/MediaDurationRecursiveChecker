@@ -106,7 +106,7 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
 class FileSizeTreeChecker:
     def __init__(self, root):
         self.root = root
-        self.root.title("Media Duration Calculator")
+        self.root.title("FileSizeTreeChecker")
         self.root.geometry("500x400")
         self.root.minsize(400, 300)  # Set minimum window size
         
