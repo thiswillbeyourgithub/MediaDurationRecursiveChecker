@@ -32,6 +32,10 @@ Vous avez trois options pour exécuter FileSizeTreeChecker :
 ### 1. Exécuter depuis les sources (interface graphique)
 1. Installer les packages Python requis :
 ```bash
+# Sur macOS :
+sudo python3 -m pip install moviepy pyperclip
+
+# Sur les autres plateformes :
 pip install moviepy pyperclip
 ```
 2. S'assurer que `ffmpeg` est installé sur le système
