@@ -1,11 +1,11 @@
-# FileSizeTreeChecker
+# MediaDurationRecursiveChecker
 
 > Une version française de ce fichier README est disponible : [README_fr.md](README_fr.md)  
 > A French version of this README is available: [README_fr.md](README_fr.md)
 
-# FileSizeTreeChecker
+# MediaDurationRecursiveChecker
 
-This Python script calculates the total duration of media files (video/audio) in a directory and estimates the total processing time. It was created to help estimate the total duration of daily/rush footage on a hard drive.
+This Python script calculates the total duration of media files (video/audio) in a directory and estimates the total processing time. It was created to help estimate the total duration of daily/rush footage on a hard drive. The project was renamed from FileSizeTreeChecker to MediaDurationRecursiveChecker to better reflect its purpose.
 
 ## Features
 
@@ -27,7 +27,7 @@ This Python script calculates the total duration of media files (video/audio) in
 
 ## Installation and Usage
 
-You have three options to run FileSizeTreeChecker:
+You have three options to run MediaDurationRecursiveChecker:
 
 ### 1. Run from Source (GUI)
 1. Install required Python packages:
@@ -41,7 +41,7 @@ pip install moviepy pyperclip
 2. Ensure `ffmpeg` is installed on your system
 3. Run the script:
 ```bash
-python FileSizeTreeChecker.py
+python MediaDurationRecursiveChecker.py
 ```
 4. Use the graphical interface to select folders and process files
 
@@ -53,13 +53,13 @@ pip install pyinstaller
 ```
 2. Build the executable:
 ```bash
-pyinstaller --onefile --name FileSizeTreeChecker FileSizeTreeChecker.py --noconsole --hidden-import=imageio_ffmpeg
+pyinstaller --onefile --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --noconsole --hidden-import=imageio_ffmpeg
 ```
 3. The executable will be in the `dist` directory
 
 Note: This has been tested to work on macOS 11 when using the command:
 ```bash
-sudo pyinstaller --onefile --windowed --name FileSizeTreeChecker FileSizeTreeChecker.py --clean
+sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
 
 A pre-compiled .app for macOS is available in the 1.0.1 release.

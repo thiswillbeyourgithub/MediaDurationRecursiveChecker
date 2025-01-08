@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""FileSizeTreeChecker - Media Duration and Size Calculator
+"""MediaDurationRecursiveChecker - Media Duration and Size Calculator
 
-Repository: https://github.com/thiswillbeyourgithub/FileSizeTreeChecker
+Repository: https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker
 Author: thiswillbeyourgithub
 License: GPLv3
 
@@ -52,7 +52,7 @@ Note: Some media files may not report accurate durations due to encoding issues.
 The application will skip these files and continue processing others.
 
 For more information, see the README at:
-https://github.com/thiswillbeyourgithub/FileSizeTreeChecker
+https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker
 """
 # /// script
 # requires-python = ">=3.8"
@@ -106,7 +106,7 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
 class FileSizeTreeChecker:
     def __init__(self, root):
         self.root = root
-        self.root.title("FileSizeTreeChecker")
+        self.root.title("MediaDurationRecursiveChecker")
         self.root.geometry("500x400")
         self.root.minsize(400, 300)  # Set minimum window size
         
@@ -292,7 +292,7 @@ class FileSizeTreeChecker:
         """Get the path to the last path file in system temp directory."""
         import tempfile
         temp_dir = Path(tempfile.gettempdir())
-        return temp_dir / "FileSizeTreeChecker_latest_path.txt"
+        return temp_dir / "MediaDurationRecursiveChecker_latest_path.txt"
 
     def _is_valid_path(self, path: str) -> bool:
         """Check if a path is valid and accessible."""
@@ -505,7 +505,7 @@ class FileSizeTreeChecker:
     def open_github(self):
         """Open the GitHub repository in the default web browser."""
         import webbrowser
-        webbrowser.open("https://github.com/thiswillbeyourgithub/FileSizeTreeChecker")
+        webbrowser.open("https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker")
         
     def toggle_documentation(self, event=None):
         """Toggle visibility of documentation section."""
