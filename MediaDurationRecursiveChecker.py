@@ -10,6 +10,7 @@ It's particularly useful for estimating total duration of video/audio collection
 
 Key Features:
 - Supports common media formats: .mp3, .mp4, .avi, .mkv, .mov, .wav, .flac, .mxf, .raw
+  (case-insensitive matching, e.g., .MP3 and .mp3 are both supported)
 - Recursively scans directories
 - Excludes hidden files (those starting with '.')
 - Provides:
@@ -445,7 +446,7 @@ class FileSizeTreeChecker:
     
             # Get all media files
             media_files = [f for f in path.rglob('*') 
-                         if f.suffix.lower() in self.get_media_extensions() 
+                         if f.suffix.lower().lstrip('.') in self.get_media_extensions() 
                          and not f.name.startswith('.')]
             
             random.shuffle(media_files)
