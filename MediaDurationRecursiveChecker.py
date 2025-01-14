@@ -71,14 +71,14 @@ from pprint import pprint
 import json
 import random
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 import threading
 import os
 import warnings
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
-def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int:
+def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> Union[int, str]:
     """Get duration of a media file in seconds.
     
     Args:
@@ -86,7 +86,7 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         base_path: Base path for relative path calculation
         verbose: Print detailed processing information
     Returns:
-        Duration in seconds, or -1 if failed to parse
+        Duration in seconds, or error message if failed to parse
     """
     try:
         # Suppress warnings unless verbose mode
@@ -99,10 +99,11 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
                 print(f"{filename:<50}: {val:>6}s")
             return val
     except Exception as e:
+        error_msg = f"Error processing {file_path.name}: {str(e)}"
         if verbose:
             filename = str(file_path.relative_to(base_path))
-            print(f"E: {filename:<50}: {e}")
-        return -1
+            print(f"E: {filename:<50}: {error_msg}")
+        return error_msg
 
 
 class FileSizeTreeChecker:
@@ -479,10 +480,10 @@ class FileSizeTreeChecker:
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
                 
-                if duration == -1:
+                if isinstance(duration, str):  # Check if it's an error message
                     failed_files.append(str(file.relative_to(path)))
                     failed_size += file_size
-                    self.queue_message(f"Failed to parse: {file.relative_to(path)}")
+                    self.queue_message(duration)  # Log the error message
                     duration = 0  # Treat as 0 duration for calculations
                     
                 current_duration += duration
