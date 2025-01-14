@@ -76,7 +76,6 @@ import os
 import warnings
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-MEDIA_EXTENSIONS = {'.mp3', '.mp4', '.avi', '.mkv', '.mov', '.wav', '.flac'}
 
 def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int:
     """Get duration of a media file in seconds.
@@ -179,9 +178,17 @@ class FileSizeTreeChecker:
         self.browse_button = ttk.Button(self.folder_frame, text="Browse", command=self.select_folder)
         self.browse_button.pack(side="right", padx=5, pady=5)
         
+        # Extensions
+        self.extensions_frame = ttk.LabelFrame(self.main_container, text="Media Extensions")
+        self.extensions_frame.grid(row=2, column=0, sticky="ew", padx=5, pady=2)
+        
+        self.extensions_var = tk.StringVar(value=".mp3,.mp4,.avi,.mkv,.mov,.wav,.flac")
+        self.extensions_entry = ttk.Entry(self.extensions_frame, textvariable=self.extensions_var)
+        self.extensions_entry.pack(fill="x", expand=True, padx=5, pady=5)
+        
         # Options
         self.options_frame = ttk.LabelFrame(self.main_container, text="Options")
-        self.options_frame.grid(row=2, column=0, sticky="ew", padx=5, pady=2)
+        self.options_frame.grid(row=3, column=0, sticky="ew", padx=5, pady=2)
         
         # Output path
         self.output_frame = ttk.Frame(self.options_frame)
@@ -214,7 +221,7 @@ class FileSizeTreeChecker:
         
         # Progress
         self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
-        self.progress_frame.grid(row=3, column=0, sticky="nsew", padx=5, pady=2)
+        self.progress_frame.grid(row=4, column=0, sticky="nsew", padx=5, pady=2)
         
         # Add scrollbar to progress text
         self.progress_text = tk.Text(self.progress_frame, height=8, state="disabled")
@@ -238,7 +245,7 @@ class FileSizeTreeChecker:
         
         # Control buttons
         self.button_frame = ttk.Frame(self.main_container)
-        self.button_frame.grid(row=4, column=0, sticky="ew", padx=5, pady=5)
+        self.button_frame.grid(row=5, column=0, sticky="ew", padx=5, pady=5)
         
         self.start_button = ttk.Button(
             self.button_frame, 
@@ -276,7 +283,7 @@ class FileSizeTreeChecker:
         
         # Add GitHub link
         self.footer_frame = ttk.Frame(self.main_container)
-        self.footer_frame.grid(row=5, column=0, sticky="ew", padx=5, pady=2)
+        self.footer_frame.grid(row=6, column=0, sticky="ew", padx=5, pady=2)
         
         self.github_link = ttk.Label(
             self.footer_frame,
@@ -310,6 +317,13 @@ class FileSizeTreeChecker:
                     f.write(path)
         except Exception:
             pass  # Silently ignore any errors
+
+    def get_media_extensions(self):
+        """Get media extensions from input field as a set."""
+        extensions = self.extensions_var.get().strip()
+        if not extensions:
+            return set()  # Empty set if no extensions provided
+        return set([ext.lower() for ext in extensions.split(",")])
 
     def _load_last_path(self) -> Optional[str]:
         """Load the last selected path from temporary file if it exists and is valid."""
@@ -430,7 +444,9 @@ class FileSizeTreeChecker:
             results = {}
     
             # Get all media files
-            media_files = [f for f in path.rglob('*') if f.suffix.lower() in MEDIA_EXTENSIONS and not f.name.startswith('.')]
+            media_files = [f for f in path.rglob('*') 
+                         if f.suffix.lower() in self.get_media_extensions() 
+                         and not f.name.startswith('.')]
             
             random.shuffle(media_files)
             
