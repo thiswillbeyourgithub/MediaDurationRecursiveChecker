@@ -85,6 +85,8 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         file_path: Path to media file
         base_path: Base path for relative path calculation
         verbose: Print detailed processing information
+    Returns:
+        Duration in seconds, or -1 if failed to parse
     """
     try:
         # Suppress warnings unless verbose mode
@@ -100,7 +102,7 @@ def get_duration(file_path: Path, base_path: Path, verbose: bool = False) -> int
         if verbose:
             filename = str(file_path.relative_to(base_path))
             print(f"E: {filename:<50}: {e}")
-        return 0
+        return -1
 
 
 class FileSizeTreeChecker:
@@ -443,7 +445,8 @@ class FileSizeTreeChecker:
         try:
             path = Path(folder)
             results = {}
-    
+            failed_files = []  # Track failed files
+
             # Get all media files
             media_files = [f for f in path.rglob('*') 
                          if f.suffix.lower().lstrip('.') in self.get_media_extensions() 
@@ -454,13 +457,14 @@ class FileSizeTreeChecker:
             # Calculate total size
             total_size = sum(f.stat().st_size for f in media_files)
             total_size_gb = total_size / (1024 ** 3)
-    
+
             self.log_message(f"Found {len(media_files)} media files ({total_size_gb:.2f} GB)")
             
             # Process files
             current_duration = 0
             processed_size = 0
             estimated_total = 0  # Initialize with 0
+            failed_size = 0  # Track size of failed files
             
             for i, file in enumerate(media_files):
                 # Calculate estimated total duration
@@ -471,8 +475,16 @@ class FileSizeTreeChecker:
                     self.log_message(f"Duration of all files seen so far: {current_duration//3600}h {(current_duration%3600)//60}m")
                     self.log_message(f"Estimated duration for all the files (seen and unseen): {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m")
                     break
+                    
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
+                
+                if duration == -1:
+                    failed_files.append(str(file.relative_to(path)))
+                    failed_size += file_size
+                    self.queue_message(f"Failed to parse: {file.relative_to(path)}")
+                    duration = 0  # Treat as 0 duration for calculations
+                    
                 current_duration += duration
                 processed_size += file_size
                 
@@ -493,6 +505,17 @@ class FileSizeTreeChecker:
                         self.queue_message(progress_msg)
             
             self.log_message(f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m")
+            
+            # Add extra information if there were failed files
+            if failed_files:
+                self.log_message(f"\nFailed to parse {len(failed_files)} files:")
+                for failed_file in failed_files:
+                    self.log_message(f" - {failed_file}")
+                
+                # Calculate extrapolated duration if we have failed files
+                if processed_size > 0 and processed_size < total_size:
+                    extrapolated_duration = (total_size / processed_size) * current_duration
+                    self.log_message(f"\nExtrapolated total duration (including failed files): {extrapolated_duration//3600:.0f}h {(extrapolated_duration%3600)//60:.0f}m")
             
             # Write results to JSON file if enabled
             if self.save_json.get():
