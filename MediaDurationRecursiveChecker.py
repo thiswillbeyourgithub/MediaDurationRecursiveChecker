@@ -9,7 +9,7 @@ This application calculates the total duration and size of media files in a dire
 It's particularly useful for estimating total duration of video/audio collections.
 
 Key Features:
-- Supports common media formats: .mp3, .mp4, .avi, .mkv, .mov, .wav, .flac
+- Supports common media formats: .mp3, .mp4, .avi, .mkv, .mov, .wav, .flac, .mxf, .raw
 - Recursively scans directories
 - Excludes hidden files (those starting with '.')
 - Provides:
@@ -182,7 +182,7 @@ class FileSizeTreeChecker:
         self.extensions_frame = ttk.LabelFrame(self.main_container, text="Media Extensions")
         self.extensions_frame.grid(row=2, column=0, sticky="ew", padx=5, pady=2)
         
-        self.extensions_var = tk.StringVar(value="mp3,mp4,avi,mkv,mov,wav,flac")
+        self.extensions_var = tk.StringVar(value="mp3,mp4,avi,mkv,mov,wav,flac,mxf,raw")
         self.extensions_entry = ttk.Entry(self.extensions_frame, textvariable=self.extensions_var)
         self.extensions_entry.pack(fill="x", expand=True, padx=5, pady=5)
         
