@@ -108,7 +108,7 @@ except (ImportError, AttributeError):
 # Configure loguru to save logs to logs.txt next to the script
 script_dir = Path(__file__).parent
 log_file = script_dir / "logs.txt"
-logger.add(log_file, rotation="10 MB", retention="10 files", level="INFO")
+logger.add(log_file, rotation="10 MB", retention=10, level="INFO")
 
 
 def calculate_file_hash(file_path: Path, chunk_size: int = 8192) -> str:
