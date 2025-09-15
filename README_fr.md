@@ -74,7 +74,7 @@ pyinstaller --onefile --name MediaDurationRecursiveChecker MediaDurationRecursiv
 ```
 3. L'exécutable sera dans le répertoire `dist`
 
-Note : Cela a été testé pour fonctionner sur macOS 11 en utilisant la commande :
+Note : Cela a été testé pour fonctionner sur macOS 11 et 12 en utilisant la commande :
 ```bash
 sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
