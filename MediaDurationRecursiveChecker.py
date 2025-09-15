@@ -78,6 +78,7 @@ import threading
 import os
 import warnings
 import hashlib
+import platform
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
@@ -319,11 +320,13 @@ class FileSizeTreeChecker:
         self.button_frame = ttk.Frame(self.main_container)
         self.button_frame.grid(row=5, column=0, sticky="ew", padx=5, pady=5)
 
+        # Use custom styling only on non-macOS platforms to avoid visibility issues
+        button_style = None if platform.system() == "Darwin" else "Accent.TButton"
         self.start_button = ttk.Button(
             self.button_frame,
             text="Start Processing",
             command=self.start_processing,
-            style="Accent.TButton",
+            style=button_style,
         )
         self.start_button.pack(side="left", expand=True, fill="x")
 
@@ -343,18 +346,20 @@ class FileSizeTreeChecker:
         self.message_queue = []
         self.update_timer = None
 
-        # Configure styles
-        style = ttk.Style()
-        style.configure(
-            "Accent.TButton",
-            font=("Helvetica", 12, "bold"),
-            padding=10,
-            foreground="white",
-            background="#800080",
-        )
-        style.map(
-            "Accent.TButton", background=[("active", "#800080"), ("!active", "#800080")]
-        )
+        # Configure styles (only on non-macOS platforms to avoid visibility issues)
+        if platform.system() != "Darwin":
+            style = ttk.Style()
+            style.configure(
+                "Accent.TButton",
+                font=("Helvetica", 12, "bold"),
+                padding=10,
+                foreground="white",
+                background="#800080",
+            )
+            style.map(
+                "Accent.TButton",
+                background=[("active", "#800080"), ("!active", "#800080")],
+            )
 
         # Add GitHub link
         self.footer_frame = ttk.Frame(self.main_container)
