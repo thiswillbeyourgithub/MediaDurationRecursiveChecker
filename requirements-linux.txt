@@ -1,0 +1,9 @@
+# Linux-specific requirements for MediaDurationRecursiveChecker
+# Includes core dependencies plus Linux considerations
+
+-r requirements.txt
+
+# Linux-specific notes:
+# - tkinter may need to be installed separately: sudo apt install python3-tk (Debian/Ubuntu)
+# - pyperclip may require xclip or xsel: sudo apt install xclip xsel
+# - For Wayland, wl-clipboard may be needed: sudo apt install wl-clipboard

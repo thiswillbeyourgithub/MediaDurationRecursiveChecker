@@ -1,0 +1,7 @@
+# Windows-specific requirements for MediaDurationRecursiveChecker
+# Includes core dependencies plus Windows-specific versions
+
+-r requirements.txt
+
+# Windows-specific clipboard handling (pyperclip handles this automatically)
+# No additional Windows-specific packages needed for this application

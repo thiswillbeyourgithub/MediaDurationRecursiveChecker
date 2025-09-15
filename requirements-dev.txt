@@ -1,0 +1,12 @@
+# Development dependencies for MediaDurationRecursiveChecker
+# Include all runtime dependencies plus development tools
+
+-r requirements.txt
+
+# Building standalone executables
+pyinstaller>=5.0.0
+
+# Development and testing tools
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0

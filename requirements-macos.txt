@@ -1,0 +1,9 @@
+# macOS-specific requirements for MediaDurationRecursiveChecker
+# Includes core dependencies plus macOS considerations
+
+-r requirements.txt
+
+# macOS-specific notes:
+# - tkinter is included with Python installations from python.org
+# - For Homebrew Python, you may need: brew install python-tk
+# - pyperclip works with macOS pasteboard automatically

@@ -1,0 +1,11 @@
+# Core dependencies for MediaDurationRecursiveChecker
+# Compatible with Python 3.8+
+
+# Media processing - used for extracting duration from video/audio files
+moviepy>=2.2.1
+
+# Clipboard integration - used for copying/pasting paths in GUI
+pyperclip>=1.9.0
+
+# Numerical computing - required by moviepy
+numpy>=1.25.0
