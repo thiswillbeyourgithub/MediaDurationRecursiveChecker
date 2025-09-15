@@ -168,12 +168,12 @@ def process_single_file(
         if isinstance(duration, str):  # Error message
             duration_error = duration
             duration = 0
-        else:
-            # Debug mode: check for zero duration on large files
-            if debug and duration == 0 and file_size > 1024 * 1024:  # 1MB threshold
-                debug_msg = f"DEBUG: Zero duration detected for large file: {file_path.relative_to(base_path)} ({file_size / (1024*1024):.1f} MB)"
-                print(debug_msg)
-                breakpoint()
+
+        # Debug mode: check for zero duration on large files
+        if debug and duration == 0 and file_size > 1024 * 1024:  # 1MB threshold
+            debug_msg = f"DEBUG: Zero duration detected for large file: {file_path.relative_to(base_path)} ({file_size / (1024*1024):.1f} MB)"
+            print(debug_msg)
+            breakpoint()
 
         return {
             "file_path": str(file_path),
