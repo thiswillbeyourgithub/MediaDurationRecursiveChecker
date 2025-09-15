@@ -135,7 +135,11 @@ def get_duration(
 
 
 def process_single_file(
-    file_path: Path, base_path: Path, verbose: bool, debug: bool, min_size_bytes: int = 0
+    file_path: Path,
+    base_path: Path,
+    verbose: bool,
+    debug: bool,
+    min_size_bytes: int = 0,
 ) -> dict:
     """Process a single media file to extract duration and hash.
 
@@ -157,7 +161,7 @@ def process_single_file(
             if verbose:
                 relative_path = str(file_path.relative_to(base_path))
                 print(f"SKIPPED (too small): {relative_path:<50}: {file_size} bytes")
-            
+
             return {
                 "file_path": str(file_path),
                 "relative_path": str(file_path.relative_to(base_path)),
@@ -399,19 +403,21 @@ class FileSizeTreeChecker:
         self.min_size_frame = ttk.Frame(self.options_frame)
         self.min_size_frame.pack(fill="x", padx=5, pady=2)
 
-        ttk.Label(self.min_size_frame, text="Minimum file size (KB):").pack(
-            side="left"
-        )
+        ttk.Label(self.min_size_frame, text="Minimum file size (KB):").pack(side="left")
 
         self.min_file_size_kb = tk.IntVar(value=100)  # Default 100KB minimum
         self.min_size_spinbox = ttk.Spinbox(
-            self.min_size_frame, from_=0, to=10000, width=8, textvariable=self.min_file_size_kb
+            self.min_size_frame,
+            from_=0,
+            to=10000,
+            width=8,
+            textvariable=self.min_file_size_kb,
         )
         self.min_size_spinbox.pack(side="left", padx=(5, 0))
 
-        ttk.Label(self.min_size_frame, text="(files smaller than this will be skipped)").pack(
-            side="left", padx=(5, 0)
-        )
+        ttk.Label(
+            self.min_size_frame, text="(files smaller than this will be skipped)"
+        ).pack(side="left", padx=(5, 0))
 
         # Progress
         self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
