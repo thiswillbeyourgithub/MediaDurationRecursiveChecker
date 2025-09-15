@@ -11,15 +11,22 @@ Ce script Python calcule la durée totale des fichiers multimédias (vidéo/audi
 
 ## Fonctionnalités
 
-- Supporte les formats multimédias courants : `.mp3`, `.mp4`, `.avi`, `.mkv`, `.mov`, `.wav`, `.flac`
+- Supporte les formats multimédias courants : `.mp3`, `.mp4`, `.avi`, `.mkv`, `.mov`, `.wav`, `.flac`, `.mxf`, `.raw` (insensible à la casse)
 - Parcourt les répertoires de manière récursive
+- Détecte et signale les fichiers dupliqués en utilisant des hachages SHA256
 - Exclut les fichiers cachés (ceux commençant par '.')
+- Traitement multi-threadé (1-16 threads configurables) pour de meilleures performances
+- Filtrage par taille minimale de fichier pour ignorer les petits fichiers
 - Fournit :
   - Le nombre total de fichiers multimédias
   - La taille totale en Go
-  - La durée totale de tous les fichiers (avec une estimation toutes les 10 fichiers)
+  - La durée totale de tous les fichiers avec estimation en temps réel
+  - Suivi du progrès avec pourcentage d'achèvement
   - Sortie détaillée avec les durées individuelles des fichiers
-  - Résultats optionnellement sauvegardés dans un fichier JSON
+  - Résultats complets sauvegardés dans un fichier JSON avec métadonnées détaillées
+  - Détection et regroupement des fichiers dupliqués
+  - Suivi et rapport des fichiers en échec
+  - Statistiques des fichiers ignorés
 
 ## Prérequis
 
@@ -87,18 +94,52 @@ Résultats sauvegardés dans media_durations.json
 
 ## Format de sortie JSON
 
-Le fichier JSON de sortie contient :
+Le fichier JSON de sortie contient des informations complètes :
 ```json
 {
-  "/chemin/vers/fichier.mp4": {
-    "duration": 3600,  // en secondes
-    "size": 1048576   // en octets
+  "summary": {
+    "total_files": 1234,
+    "processed_files": 1200,
+    "skipped_files": 34,
+    "min_file_size_kb": 100,
+    "total_size_gb": 456.78,
+    "total_duration_seconds": 55800,
+    "total_duration_readable": "15h 30m",
+    "failed_files_count": 5,
+    "duplicate_groups_count": 3,
+    "total_duplicate_files": 8
   },
-  ...
+  "files": {
+    "/chemin/vers/fichier.mp4": {
+      "duration": 3600,  // en secondes
+      "size": 1048576,   // en octets
+      "hash": "hash_sha256_ici"
+    }
+  },
+  "duplicate_groups": [
+    ["/chemin/vers/fichier1.mp4", "/chemin/vers/duplique1.mp4"],
+    ["/chemin/vers/fichier2.avi", "/chemin/vers/duplique2.avi"]
+  ],
+  "failed_files": [
+    "/chemin/vers/fichier_corrompu.mp4"
+  ]
 }
 ```
+
+## Fonctionnalités additionnelles
+
+- **L'interface se souvient du dernier dossier utilisé** pour plus de commodité
+- **Threads de traitement configurables** (1-16) pour optimiser les performances selon votre système
+- **Seuil de taille minimale de fichier** pour ignorer les petits fichiers qui ne sont peut-être pas des médias réels
+- **Mode debug** disponible pour résoudre les problèmes d'extraction de durée
+- **Documentation repliable** intégrée dans l'interface graphique
+- **Optimisations spécifiques à la plateforme** pour une meilleure compatibilité multiplateforme
+- **Raccourcis clavier** pour les opérations courantes (Ctrl+A, Ctrl+C, Ctrl+V)
 
 ## Notes
 
 - Les fichiers sont traités dans un ordre aléatoire pour fournir de meilleures estimations de temps
 - Le script gère les erreurs avec élégance, en sautant les fichiers qu'il ne peut pas traiter
+- La détection des doublons utilise des hachages SHA256 pour une identification précise
+- Le multi-threading améliore significativement la vitesse de traitement sur les systèmes modernes
+- Les fichiers ignorés (en dessous de la taille minimale) sont suivis séparément et n'affectent pas les calculs de durée

@@ -11,16 +11,22 @@ This Python script calculates the total duration of media files (video/audio) in
 
 ## Features
 
-- Supports common media formats: `.mp3`, `.mp4`, `.avi`, `.mkv`, `.mov`, `.wav`, `.flac`
+- Supports common media formats: `.mp3`, `.mp4`, `.avi`, `.mkv`, `.mov`, `.wav`, `.flac`, `.mxf`, `.raw` (case-insensitive)
 - Recursively scans directories
-- Does not count duplicate files by using hashes
+- Detects and reports duplicate files using SHA256 hashes
 - Excludes hidden files (those starting with '.')
+- Multi-threaded processing (configurable 1-16 threads) for faster performance
+- Minimum file size filtering to skip small files
 - Provides:
   - Total number of media files
   - Total size in GB
-  - Total duration of all files (and estimation every 10 files)
+  - Total duration of all files with real-time estimation
+  - Progress tracking with percentage completion
   - Verbose output with individual file durations
-  - Results optionally saved to JSON file
+  - Comprehensive results saved to JSON file with detailed metadata
+  - Duplicate file detection and grouping
+  - Failed file tracking and reporting
+  - Skipped file statistics
 
 ## Requirements
 
@@ -88,18 +94,52 @@ Results saved to media_durations.json
 
 ## JSON Output Format
 
-The output JSON file contains:
+The output JSON file contains comprehensive information:
 ```json
 {
-  "/path/to/file.mp4": {
-    "duration": 3600,  // in seconds
-    "size": 1048576   // in bytes
+  "summary": {
+    "total_files": 1234,
+    "processed_files": 1200,
+    "skipped_files": 34,
+    "min_file_size_kb": 100,
+    "total_size_gb": 456.78,
+    "total_duration_seconds": 55800,
+    "total_duration_readable": "15h 30m",
+    "failed_files_count": 5,
+    "duplicate_groups_count": 3,
+    "total_duplicate_files": 8
   },
-  ...
+  "files": {
+    "/path/to/file.mp4": {
+      "duration": 3600,  // in seconds
+      "size": 1048576,   // in bytes
+      "hash": "sha256_hash_here"
+    }
+  },
+  "duplicate_groups": [
+    ["/path/to/file1.mp4", "/path/to/duplicate1.mp4"],
+    ["/path/to/file2.avi", "/path/to/duplicate2.avi"]
+  ],
+  "failed_files": [
+    "/path/to/corrupted_file.mp4"
+  ]
 }
 ```
+
+## Additional Features
+
+- **GUI remembers last used folder** for convenience
+- **Configurable processing threads** (1-16) to optimize performance based on your system
+- **Minimum file size threshold** to skip tiny files that might not be actual media
+- **Debug mode** available for troubleshooting duration extraction issues
+- **Collapsible documentation** built into the GUI
+- **Platform-specific optimizations** for better cross-platform compatibility
+- **Keyboard shortcuts** for common operations (Ctrl+A, Ctrl+C, Ctrl+V)
 
 ## Notes
 
 - Files are processed in random order to provide better time estimates
 - The script handles errors gracefully, skipping files it can't process
+- Duplicate detection uses SHA256 hashes for accurate identification
+- Multi-threading significantly improves processing speed on modern systems
+- Skipped files (below minimum size) are tracked separately and don't affect duration calculations
