@@ -135,7 +135,7 @@ def get_duration(
 
 
 def process_single_file(
-    file_path: Path, base_path: Path, verbose: bool, debug: bool
+    file_path: Path, base_path: Path, verbose: bool, debug: bool, min_size_bytes: int = 0
 ) -> dict:
     """Process a single media file to extract duration and hash.
 
@@ -144,12 +144,30 @@ def process_single_file(
         base_path: Base path for relative path calculation
         verbose: Whether to print verbose output
         debug: Whether to enable debug mode
+        min_size_bytes: Minimum file size in bytes to process (files smaller will be skipped)
 
     Returns:
-        Dictionary containing file info: duration, size, hash, error status
+        Dictionary containing file info: duration, size, hash, error status, skipped flag
     """
     try:
         file_size = file_path.stat().st_size
+
+        # Check if file is too small to process
+        if file_size < min_size_bytes:
+            if verbose:
+                relative_path = str(file_path.relative_to(base_path))
+                print(f"SKIPPED (too small): {relative_path:<50}: {file_size} bytes")
+            
+            return {
+                "file_path": str(file_path),
+                "relative_path": str(file_path.relative_to(base_path)),
+                "duration": 0,
+                "size": file_size,
+                "hash": None,
+                "error": None,
+                "skipped": True,
+                "skip_reason": "File too small",
+            }
 
         # Calculate file hash for duplicate detection
         try:
@@ -182,6 +200,7 @@ def process_single_file(
             "size": file_size,
             "hash": file_hash,
             "error": duration_error,
+            "skipped": False,
         }
 
     except Exception as e:
@@ -192,6 +211,7 @@ def process_single_file(
             "size": 0,
             "hash": None,
             "error": f"Failed to process file: {str(e)}",
+            "skipped": False,
         }
 
 
@@ -374,6 +394,24 @@ class FileSizeTreeChecker:
             self.thread_frame, from_=1, to=16, width=5, textvariable=self.thread_count
         )
         self.thread_spinbox.pack(side="left", padx=(5, 0))
+
+        # Minimum file size option
+        self.min_size_frame = ttk.Frame(self.options_frame)
+        self.min_size_frame.pack(fill="x", padx=5, pady=2)
+
+        ttk.Label(self.min_size_frame, text="Minimum file size (KB):").pack(
+            side="left"
+        )
+
+        self.min_file_size_kb = tk.IntVar(value=100)  # Default 100KB minimum
+        self.min_size_spinbox = ttk.Spinbox(
+            self.min_size_frame, from_=0, to=10000, width=8, textvariable=self.min_file_size_kb
+        )
+        self.min_size_spinbox.pack(side="left", padx=(5, 0))
+
+        ttk.Label(self.min_size_frame, text="(files smaller than this will be skipped)").pack(
+            side="left", padx=(5, 0)
+        )
 
         # Progress
         self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
@@ -633,8 +671,10 @@ class FileSizeTreeChecker:
             num_threads = self.thread_count.get()
             verbose = self.verbose_mode.get()
             debug = self.debug_mode.get()
+            min_size_bytes = self.min_file_size_kb.get() * 1024  # Convert KB to bytes
 
             self.log_message(f"Starting processing with {num_threads} threads...")
+            self.log_message(f"Minimum file size: {self.min_file_size_kb.get()} KB")
 
             # Process files using ThreadPoolExecutor
             current_duration = 0
@@ -642,6 +682,7 @@ class FileSizeTreeChecker:
             estimated_total = 0
             failed_size = 0
             completed_files = 0
+            skipped_files = 0
             start_time = time.time()
 
             with ThreadPoolExecutor(max_workers=num_threads) as executor:
@@ -650,7 +691,7 @@ class FileSizeTreeChecker:
                 # Submit all files for processing
                 future_to_file = {
                     executor.submit(
-                        process_single_file, file, path, verbose, debug
+                        process_single_file, file, path, verbose, debug, min_size_bytes
                     ): file
                     for file in media_files
                 }
@@ -671,6 +712,13 @@ class FileSizeTreeChecker:
                         file_size = file_result["size"]
                         file_hash = file_result["hash"]
                         error = file_result["error"]
+                        skipped = file_result.get("skipped", False)
+
+                        # Handle skipped files
+                        if skipped:
+                            skipped_files += 1
+                            # Don't include skipped files in main processing stats
+                            continue
 
                         current_duration += duration
                         processed_size += file_size
@@ -709,6 +757,8 @@ class FileSizeTreeChecker:
                                 f"Sum of durations so far: {current_duration//3600}h {(current_duration%3600)//60}m | "
                                 f"Estimated total for all files: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
                             )
+                            if skipped_files > 0:
+                                progress_msg += f" | Skipped: {skipped_files}"
 
                             if (
                                 completed_files % 10 == 0
@@ -738,6 +788,10 @@ class FileSizeTreeChecker:
                 self.log_message(
                     f"Total duration: {current_duration//3600}h {(current_duration%3600)//60}m"
                 )
+                if skipped_files > 0:
+                    self.log_message(
+                        f"Skipped {skipped_files} files (smaller than {self.min_file_size_kb.get()} KB)"
+                    )
             else:
                 self.log_message(
                     f"Duration of all files seen so far: {current_duration//3600}h {(current_duration%3600)//60}m"
@@ -745,6 +799,10 @@ class FileSizeTreeChecker:
                 if estimated_total > 0:
                     self.log_message(
                         f"Estimated duration for all the files (seen and unseen): {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+                    )
+                if skipped_files > 0:
+                    self.log_message(
+                        f"Skipped {skipped_files} files so far (smaller than {self.min_file_size_kb.get()} KB)"
                     )
 
             # Report duplicate files
@@ -787,6 +845,9 @@ class FileSizeTreeChecker:
                 output_data = {
                     "summary": {
                         "total_files": len(media_files),
+                        "processed_files": len(media_files) - skipped_files,
+                        "skipped_files": skipped_files,
+                        "min_file_size_kb": self.min_file_size_kb.get(),
                         "total_size_gb": total_size_gb,
                         "total_duration_seconds": current_duration,
                         "total_duration_readable": f"{current_duration//3600}h {(current_duration%3600)//60}m",
