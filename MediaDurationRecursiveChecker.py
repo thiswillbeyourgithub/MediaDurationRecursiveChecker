@@ -796,7 +796,15 @@ class FileSizeTreeChecker:
                     for future in as_completed(future_to_file):
                         if self.cancel_requested:
                             self.log_message("\nProcessing cancelled by user")
-                            executor.shutdown(wait=False)
+                            # Cancel all pending futures
+                            for f in future_to_file:
+                                f.cancel()
+                            # Shutdown executor with cancellation (Python 3.9+) or fallback
+                            try:
+                                executor.shutdown(wait=False, cancel_futures=True)
+                            except TypeError:
+                                # Python < 3.9 fallback
+                                executor.shutdown(wait=False)
                             break
 
                         try:
@@ -996,7 +1004,11 @@ class FileSizeTreeChecker:
 
             # Also shutdown the executor if it exists
             if self.executor:
-                self.executor.shutdown(wait=False)
+                try:
+                    self.executor.shutdown(wait=False, cancel_futures=True)
+                except TypeError:
+                    # Python < 3.9 fallback
+                    self.executor.shutdown(wait=False)
 
     def open_github(self):
         """Open the GitHub repository in the default web browser."""
