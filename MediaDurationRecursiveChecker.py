@@ -141,6 +141,48 @@ def get_duration(
         if verbose:
             print(f"moviepy failed for {filename}: {str(moviepy_error)}")
 
+        # Check if this is the specific "output file must be specified" error
+        # and try an alternative moviepy approach
+        if "At least one output file must be specified" in str(moviepy_error):
+            try:
+                # Try using moviepy's ffmpeg probe directly as an alternative approach
+                from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+                from moviepy.config import FFMPEG_BINARY
+                import subprocess
+                import tempfile
+                import os
+                
+                if verbose:
+                    print(f"Trying alternative moviepy approach for {filename}...")
+                
+                # Use ffprobe to get duration directly
+                cmd = [
+                    FFMPEG_BINARY.replace('ffmpeg', 'ffprobe'),
+                    '-v', 'quiet',
+                    '-print_format', 'json',
+                    '-show_format',
+                    str(file_path)
+                ]
+                
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+                if result.returncode == 0:
+                    import json as json_module
+                    probe_data = json_module.loads(result.stdout)
+                    if 'format' in probe_data and 'duration' in probe_data['format']:
+                        val = int(float(probe_data['format']['duration']))
+                        if verbose:
+                            print(f"{filename:<50}: {val:>6}s (moviepy-ffprobe)")
+                        return val
+                    else:
+                        raise Exception("Duration not found in ffprobe output")
+                else:
+                    raise Exception(f"ffprobe failed with return code {result.returncode}")
+                    
+            except Exception as moviepy_fallback_error:
+                if verbose:
+                    print(f"moviepy fallback also failed for {filename}: {str(moviepy_fallback_error)}")
+                # Continue to pymediainfo fallback
+
         # Fallback to pymediainfo if available
         if PYMEDIAINFO_AVAILABLE:
             try:
@@ -165,7 +207,7 @@ def get_duration(
                     print(
                         f"pymediainfo also failed for {filename}: {str(pymediainfo_error)}"
                     )
-                # Both methods failed, return combined error message
+                # All methods failed, return combined error message
                 error_msg = f"Error processing {file_path.name}: moviepy failed ({str(moviepy_error)}), pymediainfo failed ({str(pymediainfo_error)})"
         else:
             # pymediainfo not available, return moviepy error
