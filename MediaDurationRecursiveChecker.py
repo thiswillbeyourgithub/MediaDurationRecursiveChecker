@@ -315,7 +315,7 @@ class FileSizeTreeChecker:
         self.root = root
         self.root.title("MediaDurationRecursiveChecker")
         self.root.geometry("625x500")
-        self.root.minsize(400, 300)  # Set minimum window size
+        self.root.minsize(400, 450)  # Set minimum window size to ensure progress area is visible
 
         # Try to load last used path
         last_path = self._load_last_path()
@@ -522,8 +522,10 @@ class FileSizeTreeChecker:
         self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
         self.progress_frame.grid(row=4, column=0, sticky="nsew", padx=5, pady=2)
 
-        # Add scrollbar to progress text
+        # Add scrollbar to progress text with minimum height enforcement
         self.progress_text = tk.Text(self.progress_frame, height=8, state="disabled")
+        # Ensure minimum height is maintained when resizing
+        self.progress_text.config(height=8)  # This enforces minimum visible lines
         scrollbar = ttk.Scrollbar(self.progress_frame, command=self.progress_text.yview)
         self.progress_text.configure(yscrollcommand=scrollbar.set)
 
@@ -531,8 +533,8 @@ class FileSizeTreeChecker:
         self.progress_text.grid(row=0, column=0, sticky="nsew")
         scrollbar.grid(row=0, column=1, sticky="ns")
 
-        # Configure grid weights for progress frame
-        self.progress_frame.grid_rowconfigure(0, weight=1)
+        # Configure grid weights for progress frame with minimum size
+        self.progress_frame.grid_rowconfigure(0, weight=1, minsize=120)  # Minimum 120px height for progress area
         self.progress_frame.grid_columnconfigure(0, weight=1)
 
         # Configure grid weights for main container
