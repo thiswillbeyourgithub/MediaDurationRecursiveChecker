@@ -140,10 +140,49 @@ def get_duration(
     if verbose:
         logger.info(f"Processing {filename} - trying {total_methods} methods...")
 
-    # Method 1/3 (or 1/2): Try moviepy
+    # Store errors from each method for final error message
+    pymediainfo_error = None
+    moviepy_error = None
+    ffprobe_error = None
+
+    # Method 1/3: Try pymediainfo first if available
+    if PYMEDIAINFO_AVAILABLE:
+        try:
+            if verbose:
+                logger.info(f"  Method 1/{total_methods} for {filename}: pymediainfo...")
+
+            media_info = MediaInfo.parse(str(file_path))
+            # Look for duration in video or audio tracks
+            duration_ms = None
+            for track in media_info.tracks:
+                if track.track_type in ["Video", "Audio"] and track.duration:
+                    duration_ms = track.duration
+                    break
+
+            if duration_ms:
+                val = int(duration_ms / 1000)  # Convert milliseconds to seconds
+                if verbose:
+                    logger.info(
+                        f"  ✓ Method 1/{total_methods} SUCCESS for {filename}: {val}s (pymediainfo)"
+                    )
+                else:
+                    logger.info(f"{filename:<50}: {val:>6}s (pymediainfo)")
+                return val
+            else:
+                raise Exception("No duration information found in media tracks")
+
+        except Exception as e:
+            pymediainfo_error = e
+            if verbose:
+                logger.info(
+                    f"  ✗ Method 1/{total_methods} FAILED for {filename}: {str(e)}"
+                )
+
+    # Method 2/3 (or 1/2 if pymediainfo unavailable): Try moviepy
     try:
+        method_num = 2 if PYMEDIAINFO_AVAILABLE else 1
         if verbose:
-            print(f"  Method 1/{total_methods} for {filename}: moviepy...")
+            logger.info(f"  Method {method_num}/{total_methods} for {filename}: moviepy...")
         # Suppress warnings unless verbose mode
         if not verbose:
             warnings.filterwarnings("ignore", category=UserWarning)
@@ -151,122 +190,87 @@ def get_duration(
             val = int(clip.duration)
             if verbose:
                 logger.info(
-                    f"  ✓ Method 1/{total_methods} SUCCESS for {filename}: {val}s (moviepy)"
+                    f"  ✓ Method {method_num}/{total_methods} SUCCESS for {filename}: {val}s (moviepy)"
                 )
             else:
                 logger.info(f"{filename:<50}: {val:>6}s (moviepy)")
             return val
-    except Exception as moviepy_error:
+    except Exception as e:
+        moviepy_error = e
+        method_num = 2 if PYMEDIAINFO_AVAILABLE else 1
         if verbose:
             logger.info(
-                f"  ✗ Method 1/{total_methods} FAILED for {filename}: {str(moviepy_error)}"
+                f"  ✗ Method {method_num}/{total_methods} FAILED for {filename}: {str(e)}"
             )
 
-        # Method 2/3 (or 2/2): Check if this is the specific "output file must be specified" error
-        # and try an alternative moviepy approach
-        if "At least one output file must be specified" in str(moviepy_error):
-            try:
-                if verbose:
-                    logger.info(
-                        f"  Method 2/{total_methods} for {filename}: moviepy-ffprobe fallback..."
-                    )
-
-                # Try using moviepy's ffmpeg probe directly as an alternative approach
-                from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-                from moviepy.config import FFMPEG_BINARY
-                import subprocess
-                import tempfile
-                import os
-
-                # Use ffprobe to get duration directly
-                cmd = [
-                    FFMPEG_BINARY.replace("ffmpeg", "ffprobe"),
-                    "-v",
-                    "quiet",
-                    "-print_format",
-                    "json",
-                    "-show_format",
-                    str(file_path),
-                ]
-
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-                if result.returncode == 0:
-                    import json as json_module
-
-                    probe_data = json_module.loads(result.stdout)
-                    if "format" in probe_data and "duration" in probe_data["format"]:
-                        val = int(float(probe_data["format"]["duration"]))
-                        if verbose:
-                            logger.info(
-                                f"  ✓ Method 2/{total_methods} SUCCESS for {filename}: {val}s (moviepy-ffprobe)"
-                            )
-                        else:
-                            logger.info(f"{filename:<50}: {val:>6}s (moviepy-ffprobe)")
-                        return val
-                    else:
-                        raise Exception("Duration not found in ffprobe output")
-                else:
-                    raise Exception(
-                        f"ffprobe failed with return code {result.returncode}"
-                    )
-
-            except Exception as moviepy_fallback_error:
-                if verbose:
-                    logger.info(
-                        f"  ✗ Method 2/{total_methods} FAILED for {filename}: {str(moviepy_fallback_error)}"
-                    )
-                # Continue to pymediainfo fallback
-        else:
-            if verbose:
-                logger.info(
-                    f"  Method 2/{total_methods} for {filename}: SKIPPED (not applicable for this error type)"
-                )
-
-        # Method 3/3: Fallback to pymediainfo if available
-        if PYMEDIAINFO_AVAILABLE:
-            try:
-                if verbose:
-                    logger.info(f"  Method 3/3 for {filename}: pymediainfo...")
-
-                media_info = MediaInfo.parse(str(file_path))
-                # Look for duration in video or audio tracks
-                duration_ms = None
-                for track in media_info.tracks:
-                    if track.track_type in ["Video", "Audio"] and track.duration:
-                        duration_ms = track.duration
-                        break
-
-                if duration_ms:
-                    val = int(duration_ms / 1000)  # Convert milliseconds to seconds
-                    if verbose:
-                        logger.info(
-                            f"  ✓ Method 3/3 SUCCESS for {filename}: {val}s (pymediainfo)"
-                        )
-                    else:
-                        logger.info(f"{filename:<50}: {val:>6}s (pymediainfo)")
-                    return val
-                else:
-                    raise Exception("No duration information found in media tracks")
-
-            except Exception as pymediainfo_error:
-                if verbose:
-                    logger.info(
-                        f"  ✗ Method 3/3 FAILED for {filename}: {str(pymediainfo_error)}"
-                    )
-                # All methods failed, return combined error message
-                error_msg = f"Error processing {file_path.name}: moviepy failed ({str(moviepy_error)}), pymediainfo failed ({str(pymediainfo_error)})"
-        else:
-            # pymediainfo not available, return moviepy error
-            if verbose:
-                logger.info(
-                    f"  Method 3/3 for {filename}: UNAVAILABLE (pymediainfo not installed)"
-                )
-            error_msg = f"Error processing {file_path.name}: moviepy failed ({str(moviepy_error)}) (pymediainfo not available as fallback)"
-
+    # Method 3/3 (or 2/2 if pymediainfo unavailable): Try ffprobe directly
+    try:
+        method_num = 3 if PYMEDIAINFO_AVAILABLE else 2
         if verbose:
-            logger.info(f"  ✗ ALL METHODS FAILED for {filename}")
-            logger.info(f"E: {filename:<50}: {error_msg}")
-        return error_msg
+            logger.info(f"  Method {method_num}/{total_methods} for {filename}: ffprobe...")
+
+        # Try using ffprobe directly
+        from moviepy.config import FFMPEG_BINARY
+        import subprocess
+
+        # Use ffprobe to get duration directly
+        cmd = [
+            FFMPEG_BINARY.replace("ffmpeg", "ffprobe"),
+            "-v",
+            "quiet",
+            "-print_format",
+            "json",
+            "-show_format",
+            str(file_path),
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        if result.returncode == 0:
+            import json as json_module
+
+            probe_data = json_module.loads(result.stdout)
+            if "format" in probe_data and "duration" in probe_data["format"]:
+                val = int(float(probe_data["format"]["duration"]))
+                if verbose:
+                    logger.info(
+                        f"  ✓ Method {method_num}/{total_methods} SUCCESS for {filename}: {val}s (ffprobe)"
+                    )
+                else:
+                    logger.info(f"{filename:<50}: {val:>6}s (ffprobe)")
+                return val
+            else:
+                raise Exception("Duration not found in ffprobe output")
+        else:
+            raise Exception(
+                f"ffprobe failed with return code {result.returncode}"
+            )
+
+    except Exception as e:
+        ffprobe_error = e
+        method_num = 3 if PYMEDIAINFO_AVAILABLE else 2
+        if verbose:
+            logger.info(
+                f"  ✗ Method {method_num}/{total_methods} FAILED for {filename}: {str(e)}"
+            )
+
+    # All methods failed, construct comprehensive error message
+    error_parts = []
+    if PYMEDIAINFO_AVAILABLE and pymediainfo_error:
+        error_parts.append(f"pymediainfo failed ({str(pymediainfo_error)})")
+    if moviepy_error:
+        error_parts.append(f"moviepy failed ({str(moviepy_error)})")
+    if ffprobe_error:
+        error_parts.append(f"ffprobe failed ({str(ffprobe_error)})")
+    
+    if not PYMEDIAINFO_AVAILABLE:
+        error_parts.append("(pymediainfo not available)")
+
+    error_msg = f"Error processing {file_path.name}: {', '.join(error_parts)}"
+
+    if verbose:
+        logger.info(f"  ✗ ALL METHODS FAILED for {filename}")
+        logger.info(f"E: {filename:<50}: {error_msg}")
+    return error_msg
 
 
 def process_single_file(
