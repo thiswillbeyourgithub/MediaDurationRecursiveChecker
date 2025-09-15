@@ -493,30 +493,30 @@ class FileSizeTreeChecker:
         self.backend_status_frame.pack(fill="x", padx=5, pady=5)
 
         # PyMediaInfo status
-        pymediainfo_status = "✓ Available" if PYMEDIAINFO_AVAILABLE else "✗ Not Available"
+        pymediainfo_status = (
+            "✓ Available" if PYMEDIAINFO_AVAILABLE else "✗ Not Available"
+        )
         pymediainfo_color = "green" if PYMEDIAINFO_AVAILABLE else "red"
         self.pymediainfo_label = ttk.Label(
-            self.backend_status_frame, 
+            self.backend_status_frame,
             text=f"PyMediaInfo: {pymediainfo_status}",
-            foreground=pymediainfo_color
+            foreground=pymediainfo_color,
         )
         self.pymediainfo_label.pack(anchor="w")
 
-        # FFmpeg/ffprobe status  
+        # FFmpeg/ffprobe status
         ffmpeg_status = "✓ Available" if FFMPEG_BINARY_AVAILABLE else "✗ Not Available"
         ffmpeg_color = "green" if FFMPEG_BINARY_AVAILABLE else "red"
         self.ffmpeg_label = ttk.Label(
             self.backend_status_frame,
             text=f"FFprobe: {ffmpeg_status}",
-            foreground=ffmpeg_color
+            foreground=ffmpeg_color,
         )
         self.ffmpeg_label.pack(anchor="w")
 
         # MoviePy is always available (it's a required dependency)
         self.moviepy_label = ttk.Label(
-            self.backend_status_frame,
-            text="MoviePy: ✓ Available",
-            foreground="green"
+            self.backend_status_frame, text="MoviePy: ✓ Available", foreground="green"
         )
         self.moviepy_label.pack(anchor="w")
 
@@ -526,7 +526,7 @@ class FileSizeTreeChecker:
             self.backend_status_frame,
             text=backend_info,
             font=("Helvetica", 8),
-            foreground="gray"
+            foreground="gray",
         )
         self.backend_info_label.pack(anchor="w", pady=(5, 0))
 
