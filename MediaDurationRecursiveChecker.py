@@ -682,7 +682,7 @@ class FileSizeTreeChecker:
             self.log_message(f"Starting processing with {num_threads} threads...")
             self.log_message(f"Minimum file size: {self.min_file_size_kb.get()} KB")
 
-            # Process files using ThreadPoolExecutor
+            # Initialize processing variables
             current_duration = 0
             processed_size = 0
             estimated_total = 0
@@ -691,26 +691,18 @@ class FileSizeTreeChecker:
             skipped_files = 0
             start_time = time.time()
 
-            with ThreadPoolExecutor(max_workers=num_threads) as executor:
-                self.executor = executor  # Store reference for cancellation
-
-                # Submit all files for processing
-                future_to_file = {
-                    executor.submit(
-                        process_single_file, file, path, verbose, debug, min_size_bytes
-                    ): file
-                    for file in media_files
-                }
-
-                # Process results as they complete
-                for future in as_completed(future_to_file):
+            # Use different processing paths depending on thread count to avoid threading overhead when not needed
+            if num_threads == 1:
+                # Single-threaded processing - avoid threading infrastructure entirely
+                self.log_message("Using single-threaded processing (no threading overhead)")
+                
+                for file in media_files:
                     if self.cancel_requested:
                         self.log_message("\nProcessing cancelled by user")
-                        executor.shutdown(wait=False)
                         break
 
                     try:
-                        file_result = future.result()
+                        file_result = process_single_file(file, path, verbose, debug, min_size_bytes)
                         completed_files += 1
 
                         # Extract results
@@ -774,7 +766,94 @@ class FileSizeTreeChecker:
                     except Exception as e:
                         self.queue_message(f"Error processing file: {str(e)}")
 
-                self.executor = None  # Clear reference
+            else:
+                # Multi-threaded processing using ThreadPoolExecutor
+                self.log_message(f"Using multi-threaded processing with {num_threads} threads")
+                
+                with ThreadPoolExecutor(max_workers=num_threads) as executor:
+                    self.executor = executor  # Store reference for cancellation
+
+                    # Submit all files for processing
+                    future_to_file = {
+                        executor.submit(
+                            process_single_file, file, path, verbose, debug, min_size_bytes
+                        ): file
+                        for file in media_files
+                    }
+
+                    # Process results as they complete
+                    for future in as_completed(future_to_file):
+                        if self.cancel_requested:
+                            self.log_message("\nProcessing cancelled by user")
+                            executor.shutdown(wait=False)
+                            break
+
+                        try:
+                            file_result = future.result()
+                            completed_files += 1
+
+                            # Extract results
+                            duration = file_result["duration"]
+                            file_size = file_result["size"]
+                            file_hash = file_result["hash"]
+                            error = file_result["error"]
+                            skipped = file_result.get("skipped", False)
+
+                            # Handle skipped files
+                            if skipped:
+                                skipped_files += 1
+                                # Don't include skipped files in main processing stats
+                                continue
+
+                            current_duration += duration
+                            processed_size += file_size
+
+                            # Handle errors
+                            if error:
+                                failed_files.append(file_result["relative_path"])
+                                failed_size += file_size
+                                if verbose:
+                                    self.queue_message(error)
+
+                            # Track duplicates by hash
+                            if file_hash:
+                                if file_hash in file_hashes:
+                                    file_hashes[file_hash].append(
+                                        file_result["relative_path"]
+                                    )
+                                else:
+                                    file_hashes[file_hash] = [file_result["relative_path"]]
+
+                            # Store results
+                            results[file_result["file_path"]] = {
+                                "duration": duration,
+                                "size": file_size,
+                                "hash": file_hash,
+                            }
+
+                            # Calculate progress and estimated total
+                            if processed_size > 0:
+                                estimated_total = (
+                                    total_size / processed_size
+                                ) * current_duration
+                                percent_done = completed_files / len(media_files) * 100
+                                progress_msg = (
+                                    f"[{completed_files}/{len(media_files)} ({percent_done:.1f}%)] "
+                                    f"Sum of durations so far: {current_duration//3600}h {(current_duration%3600)//60}m | "
+                                    f"Estimated total for all files: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+                                )
+                                if skipped_files > 0:
+                                    progress_msg += f" | Skipped: {skipped_files}"
+
+                                if (
+                                    completed_files % 10 == 0
+                                ):  # Update progress every 10 files
+                                    self.queue_message(progress_msg)
+
+                        except Exception as e:
+                            self.queue_message(f"Error processing file: {str(e)}")
+
+                    self.executor = None  # Clear reference
 
             # Calculate processing time
             processing_time = time.time() - start_time
