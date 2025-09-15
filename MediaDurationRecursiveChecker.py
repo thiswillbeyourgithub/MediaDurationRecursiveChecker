@@ -149,7 +149,9 @@ def get_duration(
     if PYMEDIAINFO_AVAILABLE:
         try:
             if verbose:
-                logger.info(f"  Method 1/{total_methods} for {filename}: pymediainfo...")
+                logger.info(
+                    f"  Method 1/{total_methods} for {filename}: pymediainfo..."
+                )
 
             media_info = MediaInfo.parse(str(file_path))
             # Look for duration in video or audio tracks
@@ -182,7 +184,9 @@ def get_duration(
     try:
         method_num = 2 if PYMEDIAINFO_AVAILABLE else 1
         if verbose:
-            logger.info(f"  Method {method_num}/{total_methods} for {filename}: moviepy...")
+            logger.info(
+                f"  Method {method_num}/{total_methods} for {filename}: moviepy..."
+            )
         # Suppress warnings unless verbose mode
         if not verbose:
             warnings.filterwarnings("ignore", category=UserWarning)
@@ -207,7 +211,9 @@ def get_duration(
     try:
         method_num = 3 if PYMEDIAINFO_AVAILABLE else 2
         if verbose:
-            logger.info(f"  Method {method_num}/{total_methods} for {filename}: ffprobe...")
+            logger.info(
+                f"  Method {method_num}/{total_methods} for {filename}: ffprobe..."
+            )
 
         # Try using ffprobe directly
         from moviepy.config import FFMPEG_BINARY
@@ -241,9 +247,7 @@ def get_duration(
             else:
                 raise Exception("Duration not found in ffprobe output")
         else:
-            raise Exception(
-                f"ffprobe failed with return code {result.returncode}"
-            )
+            raise Exception(f"ffprobe failed with return code {result.returncode}")
 
     except Exception as e:
         ffprobe_error = e
@@ -261,7 +265,7 @@ def get_duration(
         error_parts.append(f"moviepy failed ({str(moviepy_error)})")
     if ffprobe_error:
         error_parts.append(f"ffprobe failed ({str(ffprobe_error)})")
-    
+
     if not PYMEDIAINFO_AVAILABLE:
         error_parts.append("(pymediainfo not available)")
 
