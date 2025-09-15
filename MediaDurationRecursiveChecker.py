@@ -79,6 +79,7 @@ import os
 import warnings
 import hashlib
 import platform
+import time
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
@@ -556,6 +557,9 @@ class FileSizeTreeChecker:
             processed_size = 0
             estimated_total = 0  # Initialize with 0
             failed_size = 0  # Track size of failed files
+            total_hash_time = 0  # Track total time spent on hash computation
+
+            self.log_message("Starting hash computation for duplicate detection...")
 
             for i, file in enumerate(media_files):
                 # Calculate estimated total duration
@@ -572,6 +576,7 @@ class FileSizeTreeChecker:
                     break
 
                 # Calculate file hash for duplicate detection
+                hash_start_time = time.time()
                 try:
                     file_hash = calculate_file_hash(file)
                 except Exception as e:
@@ -580,6 +585,8 @@ class FileSizeTreeChecker:
                             f"Failed to calculate hash for {file.name}: {str(e)}"
                         )
                     file_hash = None
+                hash_end_time = time.time()
+                total_hash_time += hash_end_time - hash_start_time
 
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
@@ -639,7 +646,10 @@ class FileSizeTreeChecker:
             )  # Don't count the original
 
             self.log_message(
-                f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m"
+                f"\nHash computation completed in {total_hash_time:.2f} seconds"
+            )
+            self.log_message(
+                f"Total duration: {current_duration//3600}h {(current_duration%3600)//60}m"
             )
 
             # Report duplicate files
