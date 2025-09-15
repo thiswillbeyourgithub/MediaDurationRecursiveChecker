@@ -84,6 +84,7 @@ import platform
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from moviepy.video.io.VideoFileClip import VideoFileClip
+from loguru import logger
 
 try:
     from pymediainfo import MediaInfo
@@ -91,6 +92,12 @@ try:
     PYMEDIAINFO_AVAILABLE = True
 except ImportError:
     PYMEDIAINFO_AVAILABLE = False
+
+
+# Configure loguru to save logs to logs.txt next to the script
+script_dir = Path(__file__).parent
+log_file = script_dir / "logs.txt"
+logger.add(log_file, rotation="10 MB", retention="10 files", level="INFO")
 
 
 def calculate_file_hash(file_path: Path, chunk_size: int = 8192) -> str:
@@ -131,7 +138,7 @@ def get_duration(
     total_methods = 3 if PYMEDIAINFO_AVAILABLE else 2
 
     if verbose:
-        print(f"Processing {filename} - trying {total_methods} methods...")
+        logger.info(f"Processing {filename} - trying {total_methods} methods...")
 
     # Method 1/3 (or 1/2): Try moviepy
     try:
@@ -143,15 +150,15 @@ def get_duration(
         with VideoFileClip(str(file_path)) as clip:
             val = int(clip.duration)
             if verbose:
-                print(
+                logger.info(
                     f"  ✓ Method 1/{total_methods} SUCCESS for {filename}: {val}s (moviepy)"
                 )
             else:
-                print(f"{filename:<50}: {val:>6}s (moviepy)")
+                logger.info(f"{filename:<50}: {val:>6}s (moviepy)")
             return val
     except Exception as moviepy_error:
         if verbose:
-            print(
+            logger.info(
                 f"  ✗ Method 1/{total_methods} FAILED for {filename}: {str(moviepy_error)}"
             )
 
@@ -160,7 +167,7 @@ def get_duration(
         if "At least one output file must be specified" in str(moviepy_error):
             try:
                 if verbose:
-                    print(
+                    logger.info(
                         f"  Method 2/{total_methods} for {filename}: moviepy-ffprobe fallback..."
                     )
 
@@ -190,11 +197,11 @@ def get_duration(
                     if "format" in probe_data and "duration" in probe_data["format"]:
                         val = int(float(probe_data["format"]["duration"]))
                         if verbose:
-                            print(
+                            logger.info(
                                 f"  ✓ Method 2/{total_methods} SUCCESS for {filename}: {val}s (moviepy-ffprobe)"
                             )
                         else:
-                            print(f"{filename:<50}: {val:>6}s (moviepy-ffprobe)")
+                            logger.info(f"{filename:<50}: {val:>6}s (moviepy-ffprobe)")
                         return val
                     else:
                         raise Exception("Duration not found in ffprobe output")
@@ -205,13 +212,13 @@ def get_duration(
 
             except Exception as moviepy_fallback_error:
                 if verbose:
-                    print(
+                    logger.info(
                         f"  ✗ Method 2/{total_methods} FAILED for {filename}: {str(moviepy_fallback_error)}"
                     )
                 # Continue to pymediainfo fallback
         else:
             if verbose:
-                print(
+                logger.info(
                     f"  Method 2/{total_methods} for {filename}: SKIPPED (not applicable for this error type)"
                 )
 
@@ -219,7 +226,7 @@ def get_duration(
         if PYMEDIAINFO_AVAILABLE:
             try:
                 if verbose:
-                    print(f"  Method 3/3 for {filename}: pymediainfo...")
+                    logger.info(f"  Method 3/3 for {filename}: pymediainfo...")
 
                 media_info = MediaInfo.parse(str(file_path))
                 # Look for duration in video or audio tracks
@@ -232,18 +239,18 @@ def get_duration(
                 if duration_ms:
                     val = int(duration_ms / 1000)  # Convert milliseconds to seconds
                     if verbose:
-                        print(
+                        logger.info(
                             f"  ✓ Method 3/3 SUCCESS for {filename}: {val}s (pymediainfo)"
                         )
                     else:
-                        print(f"{filename:<50}: {val:>6}s (pymediainfo)")
+                        logger.info(f"{filename:<50}: {val:>6}s (pymediainfo)")
                     return val
                 else:
                     raise Exception("No duration information found in media tracks")
 
             except Exception as pymediainfo_error:
                 if verbose:
-                    print(
+                    logger.info(
                         f"  ✗ Method 3/3 FAILED for {filename}: {str(pymediainfo_error)}"
                     )
                 # All methods failed, return combined error message
@@ -251,14 +258,14 @@ def get_duration(
         else:
             # pymediainfo not available, return moviepy error
             if verbose:
-                print(
+                logger.info(
                     f"  Method 3/3 for {filename}: UNAVAILABLE (pymediainfo not installed)"
                 )
             error_msg = f"Error processing {file_path.name}: moviepy failed ({str(moviepy_error)}) (pymediainfo not available as fallback)"
 
         if verbose:
-            print(f"  ✗ ALL METHODS FAILED for {filename}")
-            print(f"E: {filename:<50}: {error_msg}")
+            logger.info(f"  ✗ ALL METHODS FAILED for {filename}")
+            logger.info(f"E: {filename:<50}: {error_msg}")
         return error_msg
 
 
@@ -288,7 +295,7 @@ def process_single_file(
         if file_size < min_size_bytes:
             if verbose:
                 relative_path = str(file_path.relative_to(base_path))
-                print(f"SKIPPED (too small): {relative_path:<50}: {file_size} bytes")
+                logger.info(f"SKIPPED (too small): {relative_path:<50}: {file_size} bytes")
 
             return {
                 "file_path": str(file_path),
@@ -307,7 +314,7 @@ def process_single_file(
         except Exception as e:
             if verbose:
                 error_msg = f"Failed to calculate hash for {file_path.name}: {str(e)}"
-                print(error_msg)
+                logger.info(error_msg)
             file_hash = None
 
         # Get duration
@@ -322,7 +329,7 @@ def process_single_file(
         # Debug mode: check for zero duration on large files
         if debug and duration == 0 and file_size > min_size_bytes:
             debug_msg = f"DEBUG: Zero duration detected for large file: {file_path.relative_to(base_path)} ({file_size / (1024*1024):.1f} MB)"
-            print(debug_msg)
+            logger.info(debug_msg)
             breakpoint()
 
         return {
@@ -1207,7 +1214,7 @@ if __name__ == "__main__":
         app = FileSizeTreeChecker(root)
         root.mainloop()
     except KeyboardInterrupt:
-        print("\nKeyboard interrupt received. Exiting gracefully...")
+        logger.info("\nKeyboard interrupt received. Exiting gracefully...")
         try:
             if app.processing_thread and app.processing_thread.is_alive():
                 app.cancel_processing()
