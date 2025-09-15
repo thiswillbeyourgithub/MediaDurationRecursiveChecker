@@ -290,6 +290,14 @@ class FileSizeTreeChecker:
         )
         self.verbose_check.pack(anchor="w", padx=5, pady=2)
 
+        self.debug_mode = tk.BooleanVar(value=False)
+        self.debug_check = ttk.Checkbutton(
+            self.options_frame,
+            text="Debug mode (breakpoint on 0 duration for large files)",
+            variable=self.debug_mode,
+        )
+        self.debug_check.pack(anchor="w", padx=5, pady=2)
+
         # Progress
         self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
         self.progress_frame.grid(row=4, column=0, sticky="nsew", padx=5, pady=2)
@@ -581,6 +589,17 @@ class FileSizeTreeChecker:
                     failed_size += file_size
                     self.queue_message(duration)  # Log the error message
                     duration = 0  # Treat as 0 duration for calculations
+                else:
+                    # Debug mode: breakpoint on 0 duration for files larger than 1MB
+                    if (
+                        self.debug_mode.get()
+                        and duration == 0
+                        and file_size > 1024 * 1024
+                    ):  # 1MB threshold
+                        self.log_message(
+                            f"DEBUG: Zero duration detected for large file: {file.relative_to(path)} ({file_size / (1024*1024):.1f} MB)"
+                        )
+                        breakpoint()
 
                 current_duration += duration
                 processed_size += file_size
