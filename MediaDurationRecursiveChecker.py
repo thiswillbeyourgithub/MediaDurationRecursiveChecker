@@ -476,6 +476,14 @@ class FileSizeTreeChecker:
         )
         self.debug_check.pack(anchor="w", padx=5, pady=2)
 
+        self.stop_on_error = tk.BooleanVar(value=False)
+        self.stop_on_error_check = ttk.Checkbutton(
+            self.options_frame,
+            text="Stop processing on first file error",
+            variable=self.stop_on_error,
+        )
+        self.stop_on_error_check.pack(anchor="w", padx=5, pady=2)
+
         # Thread count option
         self.thread_frame = ttk.Frame(self.options_frame)
         self.thread_frame.pack(fill="x", padx=5, pady=2)
@@ -769,6 +777,7 @@ class FileSizeTreeChecker:
             num_threads = self.thread_count.get()
             verbose = self.verbose_mode.get()
             debug = self.debug_mode.get()
+            stop_on_error = self.stop_on_error.get()
             min_size_bytes = self.min_file_size_kb.get() * 1024  # Convert KB to bytes
 
             self.log_message(f"Starting processing with {num_threads} threads...")
@@ -823,6 +832,12 @@ class FileSizeTreeChecker:
                             failed_size += file_size
                             if verbose:
                                 self.queue_message(error)
+                            
+                            # Stop processing if stop_on_error is enabled
+                            if stop_on_error:
+                                self.log_message(f"\nStopping processing due to error in file: {file_result['relative_path']}")
+                                self.log_message(f"Error: {error}")
+                                break
 
                         # Track duplicates by hash
                         if file_hash:
@@ -925,6 +940,21 @@ class FileSizeTreeChecker:
                                 failed_size += file_size
                                 if verbose:
                                     self.queue_message(error)
+                                
+                                # Stop processing if stop_on_error is enabled
+                                if stop_on_error:
+                                    self.log_message(f"\nStopping processing due to error in file: {file_result['relative_path']}")
+                                    self.log_message(f"Error: {error}")
+                                    # Cancel all pending futures
+                                    for f in future_to_file:
+                                        f.cancel()
+                                    # Shutdown executor with cancellation (Python 3.9+) or fallback
+                                    try:
+                                        executor.shutdown(wait=False, cancel_futures=True)
+                                    except TypeError:
+                                        # Python < 3.9 fallback
+                                        executor.shutdown(wait=False)
+                                    break
 
                             # Track duplicates by hash
                             if file_hash:
