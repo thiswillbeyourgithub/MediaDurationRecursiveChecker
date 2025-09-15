@@ -315,7 +315,9 @@ class FileSizeTreeChecker:
         self.root = root
         self.root.title("MediaDurationRecursiveChecker")
         self.root.geometry("625x500")
-        self.root.minsize(400, 450)  # Set minimum window size to ensure progress area is visible
+        self.root.minsize(
+            400, 450
+        )  # Set minimum window size to ensure progress area is visible
 
         # Try to load last used path
         last_path = self._load_last_path()
@@ -534,7 +536,9 @@ class FileSizeTreeChecker:
         scrollbar.grid(row=0, column=1, sticky="ns")
 
         # Configure grid weights for progress frame with minimum size
-        self.progress_frame.grid_rowconfigure(0, weight=1, minsize=120)  # Minimum 120px height for progress area
+        self.progress_frame.grid_rowconfigure(
+            0, weight=1, minsize=120
+        )  # Minimum 120px height for progress area
         self.progress_frame.grid_columnconfigure(0, weight=1)
 
         # Configure grid weights for main container
