@@ -13,6 +13,7 @@ This Python script calculates the total duration of media files (video/audio) in
 
 - Supports common media formats: `.mp3`, `.mp4`, `.avi`, `.mkv`, `.mov`, `.wav`, `.flac`
 - Recursively scans directories
+- Does not count duplicate files by using hashes
 - Excludes hidden files (those starting with '.')
 - Provides:
   - Total number of media files
