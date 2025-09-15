@@ -694,15 +694,19 @@ class FileSizeTreeChecker:
             # Use different processing paths depending on thread count to avoid threading overhead when not needed
             if num_threads == 1:
                 # Single-threaded processing - avoid threading infrastructure entirely
-                self.log_message("Using single-threaded processing (no threading overhead)")
-                
+                self.log_message(
+                    "Using single-threaded processing (no threading overhead)"
+                )
+
                 for file in media_files:
                     if self.cancel_requested:
                         self.log_message("\nProcessing cancelled by user")
                         break
 
                     try:
-                        file_result = process_single_file(file, path, verbose, debug, min_size_bytes)
+                        file_result = process_single_file(
+                            file, path, verbose, debug, min_size_bytes
+                        )
                         completed_files += 1
 
                         # Extract results
@@ -768,15 +772,22 @@ class FileSizeTreeChecker:
 
             else:
                 # Multi-threaded processing using ThreadPoolExecutor
-                self.log_message(f"Using multi-threaded processing with {num_threads} threads")
-                
+                self.log_message(
+                    f"Using multi-threaded processing with {num_threads} threads"
+                )
+
                 with ThreadPoolExecutor(max_workers=num_threads) as executor:
                     self.executor = executor  # Store reference for cancellation
 
                     # Submit all files for processing
                     future_to_file = {
                         executor.submit(
-                            process_single_file, file, path, verbose, debug, min_size_bytes
+                            process_single_file,
+                            file,
+                            path,
+                            verbose,
+                            debug,
+                            min_size_bytes,
                         ): file
                         for file in media_files
                     }
@@ -822,7 +833,9 @@ class FileSizeTreeChecker:
                                         file_result["relative_path"]
                                     )
                                 else:
-                                    file_hashes[file_hash] = [file_result["relative_path"]]
+                                    file_hashes[file_hash] = [
+                                        file_result["relative_path"]
+                                    ]
 
                             # Store results
                             results[file_result["file_path"]] = {
