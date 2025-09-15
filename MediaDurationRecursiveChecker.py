@@ -655,7 +655,8 @@ class FileSizeTreeChecker:
             file_hashes = {}  # Track files by hash for duplicate detection
             duplicate_groups = []  # List of lists of duplicate files
 
-            # Get all media files
+            # Get all media files (case-insensitive extension matching)
+            # f.suffix.lower() ensures .MP4, .mp4, .Mp4 all match "mp4" in extensions
             media_files = [
                 f
                 for f in path.rglob("*")
