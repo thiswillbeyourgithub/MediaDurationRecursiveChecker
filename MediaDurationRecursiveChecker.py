@@ -314,7 +314,7 @@ class FileSizeTreeChecker:
     def __init__(self, root):
         self.root = root
         self.root.title("MediaDurationRecursiveChecker")
-        self.root.geometry("500x400")
+        self.root.geometry("625x500")
         self.root.minsize(400, 300)  # Set minimum window size
 
         # Try to load last used path
@@ -323,10 +323,10 @@ class FileSizeTreeChecker:
 
         # Set initial window position based on last path
         if last_path:
-            self.root.geometry("500x300+100+100")  # Default position
+            self.root.geometry("625x375+100+100")  # Default position
         else:
             # Center window if no last path
-            self.root.geometry("500x300")
+            self.root.geometry("625x375")
             self.root.eval("tk::PlaceWindow . center")
 
         # Main container using grid
