@@ -295,7 +295,9 @@ def process_single_file(
         if file_size < min_size_bytes:
             if verbose:
                 relative_path = str(file_path.relative_to(base_path))
-                logger.info(f"SKIPPED (too small): {relative_path:<50}: {file_size} bytes")
+                logger.info(
+                    f"SKIPPED (too small): {relative_path:<50}: {file_size} bytes"
+                )
 
             return {
                 "file_path": str(file_path),
