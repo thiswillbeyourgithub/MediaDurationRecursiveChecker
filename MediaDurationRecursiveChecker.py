@@ -714,9 +714,15 @@ class FileSizeTreeChecker:
                     json.dump(output_data, f, indent=2)
                 self.log_message(f"Results saved to {outpath}")
 
-            messagebox.showinfo(
-                "Processing Complete", "Media duration calculation finished!"
-            )
+            if self.cancel_requested:
+                messagebox.showinfo(
+                    "Processing Cancelled",
+                    "Media duration calculation was cancelled by user.",
+                )
+            else:
+                messagebox.showinfo(
+                    "Processing Complete", "Media duration calculation finished!"
+                )
 
         except Exception as e:
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
