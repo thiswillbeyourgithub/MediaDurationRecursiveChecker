@@ -134,21 +134,23 @@ def get_duration(
         return error_msg
 
 
-def process_single_file(file_path: Path, base_path: Path, verbose: bool, debug: bool) -> dict:
+def process_single_file(
+    file_path: Path, base_path: Path, verbose: bool, debug: bool
+) -> dict:
     """Process a single media file to extract duration and hash.
-    
+
     Args:
         file_path: Path to the media file
         base_path: Base path for relative path calculation
         verbose: Whether to print verbose output
         debug: Whether to enable debug mode
-        
+
     Returns:
         Dictionary containing file info: duration, size, hash, error status
     """
     try:
         file_size = file_path.stat().st_size
-        
+
         # Calculate file hash for duplicate detection
         try:
             file_hash = calculate_file_hash(file_path)
@@ -157,10 +159,10 @@ def process_single_file(file_path: Path, base_path: Path, verbose: bool, debug: 
                 error_msg = f"Failed to calculate hash for {file_path.name}: {str(e)}"
                 print(error_msg)
             file_hash = None
-        
+
         # Get duration
         duration = get_duration(file_path, base_path, verbose)
-        
+
         # Check if duration extraction failed
         duration_error = None
         if isinstance(duration, str):  # Error message
@@ -172,24 +174,24 @@ def process_single_file(file_path: Path, base_path: Path, verbose: bool, debug: 
                 debug_msg = f"DEBUG: Zero duration detected for large file: {file_path.relative_to(base_path)} ({file_size / (1024*1024):.1f} MB)"
                 print(debug_msg)
                 breakpoint()
-        
+
         return {
-            'file_path': str(file_path),
-            'relative_path': str(file_path.relative_to(base_path)),
-            'duration': duration,
-            'size': file_size,
-            'hash': file_hash,
-            'error': duration_error
+            "file_path": str(file_path),
+            "relative_path": str(file_path.relative_to(base_path)),
+            "duration": duration,
+            "size": file_size,
+            "hash": file_hash,
+            "error": duration_error,
         }
-        
+
     except Exception as e:
         return {
-            'file_path': str(file_path),
-            'relative_path': str(file_path.relative_to(base_path)),
-            'duration': 0,
-            'size': 0,
-            'hash': None,
-            'error': f"Failed to process file: {str(e)}"
+            "file_path": str(file_path),
+            "relative_path": str(file_path.relative_to(base_path)),
+            "duration": 0,
+            "size": 0,
+            "hash": None,
+            "error": f"Failed to process file: {str(e)}",
         }
 
 
@@ -362,16 +364,14 @@ class FileSizeTreeChecker:
         # Thread count option
         self.thread_frame = ttk.Frame(self.options_frame)
         self.thread_frame.pack(fill="x", padx=5, pady=2)
-        
-        ttk.Label(self.thread_frame, text="Number of processing threads:").pack(side="left")
-        
+
+        ttk.Label(self.thread_frame, text="Number of processing threads:").pack(
+            side="left"
+        )
+
         self.thread_count = tk.IntVar(value=4)
         self.thread_spinbox = ttk.Spinbox(
-            self.thread_frame, 
-            from_=1, 
-            to=16, 
-            width=5, 
-            textvariable=self.thread_count
+            self.thread_frame, from_=1, to=16, width=5, textvariable=self.thread_count
         )
         self.thread_spinbox.pack(side="left", padx=(5, 0))
 
@@ -646,10 +646,12 @@ class FileSizeTreeChecker:
 
             with ThreadPoolExecutor(max_workers=num_threads) as executor:
                 self.executor = executor  # Store reference for cancellation
-                
+
                 # Submit all files for processing
                 future_to_file = {
-                    executor.submit(process_single_file, file, path, verbose, debug): file 
+                    executor.submit(
+                        process_single_file, file, path, verbose, debug
+                    ): file
                     for file in media_files
                 }
 
@@ -663,19 +665,19 @@ class FileSizeTreeChecker:
                     try:
                         file_result = future.result()
                         completed_files += 1
-                        
+
                         # Extract results
-                        duration = file_result['duration']
-                        file_size = file_result['size']
-                        file_hash = file_result['hash']
-                        error = file_result['error']
-                        
+                        duration = file_result["duration"]
+                        file_size = file_result["size"]
+                        file_hash = file_result["hash"]
+                        error = file_result["error"]
+
                         current_duration += duration
                         processed_size += file_size
 
                         # Handle errors
                         if error:
-                            failed_files.append(file_result['relative_path'])
+                            failed_files.append(file_result["relative_path"])
                             failed_size += file_size
                             if verbose:
                                 self.queue_message(error)
@@ -683,12 +685,14 @@ class FileSizeTreeChecker:
                         # Track duplicates by hash
                         if file_hash:
                             if file_hash in file_hashes:
-                                file_hashes[file_hash].append(file_result['relative_path'])
+                                file_hashes[file_hash].append(
+                                    file_result["relative_path"]
+                                )
                             else:
-                                file_hashes[file_hash] = [file_result['relative_path']]
+                                file_hashes[file_hash] = [file_result["relative_path"]]
 
                         # Store results
-                        results[file_result['file_path']] = {
+                        results[file_result["file_path"]] = {
                             "duration": duration,
                             "size": file_size,
                             "hash": file_hash,
@@ -696,7 +700,9 @@ class FileSizeTreeChecker:
 
                         # Calculate progress and estimated total
                         if processed_size > 0:
-                            estimated_total = (total_size / processed_size) * current_duration
+                            estimated_total = (
+                                total_size / processed_size
+                            ) * current_duration
                             percent_done = completed_files / len(media_files) * 100
                             progress_msg = (
                                 f"[{completed_files}/{len(media_files)} ({percent_done:.1f}%)] "
@@ -704,7 +710,9 @@ class FileSizeTreeChecker:
                                 f"Estimated total for all files: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
                             )
 
-                            if completed_files % 10 == 0:  # Update progress every 10 files
+                            if (
+                                completed_files % 10 == 0
+                            ):  # Update progress every 10 files
                                 self.queue_message(progress_msg)
 
                     except Exception as e:
@@ -826,7 +834,7 @@ class FileSizeTreeChecker:
             self.cancel_requested = True
             self.log_message("\nCancelling... Please wait for current files to finish.")
             self.cancel_button.config(state="disabled")
-            
+
             # Also shutdown the executor if it exists
             if self.executor:
                 self.executor.shutdown(wait=False)
