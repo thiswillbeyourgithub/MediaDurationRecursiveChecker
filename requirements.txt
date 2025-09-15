@@ -9,3 +9,6 @@ pyperclip>=1.9.0
 
 # Numerical computing - required by moviepy
 numpy>=1.25.0
+
+# logs
+loguru >= 0.7.3
