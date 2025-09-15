@@ -832,10 +832,12 @@ class FileSizeTreeChecker:
                             failed_size += file_size
                             if verbose:
                                 self.queue_message(error)
-                            
+
                             # Stop processing if stop_on_error is enabled
                             if stop_on_error:
-                                self.log_message(f"\nStopping processing due to error in file: {file_result['relative_path']}")
+                                self.log_message(
+                                    f"\nStopping processing due to error in file: {file_result['relative_path']}"
+                                )
                                 self.log_message(f"Error: {error}")
                                 break
 
@@ -940,17 +942,21 @@ class FileSizeTreeChecker:
                                 failed_size += file_size
                                 if verbose:
                                     self.queue_message(error)
-                                
+
                                 # Stop processing if stop_on_error is enabled
                                 if stop_on_error:
-                                    self.log_message(f"\nStopping processing due to error in file: {file_result['relative_path']}")
+                                    self.log_message(
+                                        f"\nStopping processing due to error in file: {file_result['relative_path']}"
+                                    )
                                     self.log_message(f"Error: {error}")
                                     # Cancel all pending futures
                                     for f in future_to_file:
                                         f.cancel()
                                     # Shutdown executor with cancellation (Python 3.9+) or fallback
                                     try:
-                                        executor.shutdown(wait=False, cancel_futures=True)
+                                        executor.shutdown(
+                                            wait=False, cancel_futures=True
+                                        )
                                     except TypeError:
                                         # Python < 3.9 fallback
                                         executor.shutdown(wait=False)
