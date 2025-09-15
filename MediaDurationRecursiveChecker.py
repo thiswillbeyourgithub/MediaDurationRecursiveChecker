@@ -96,7 +96,7 @@ except ImportError:
 try:
     from moviepy.config import FFMPEG_BINARY
     import subprocess
-    
+
     # Test if ffprobe is available by checking if we can construct the path
     FFMPEG_BINARY_PATH = FFMPEG_BINARY.replace("ffmpeg", "ffprobe")
     FFMPEG_BINARY_AVAILABLE = True
