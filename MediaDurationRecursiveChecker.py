@@ -80,6 +80,7 @@ import warnings
 import hashlib
 import platform
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 
@@ -131,6 +132,65 @@ def get_duration(
             filename = str(file_path.relative_to(base_path))
             print(f"E: {filename:<50}: {error_msg}")
         return error_msg
+
+
+def process_single_file(file_path: Path, base_path: Path, verbose: bool, debug: bool) -> dict:
+    """Process a single media file to extract duration and hash.
+    
+    Args:
+        file_path: Path to the media file
+        base_path: Base path for relative path calculation
+        verbose: Whether to print verbose output
+        debug: Whether to enable debug mode
+        
+    Returns:
+        Dictionary containing file info: duration, size, hash, error status
+    """
+    try:
+        file_size = file_path.stat().st_size
+        
+        # Calculate file hash for duplicate detection
+        try:
+            file_hash = calculate_file_hash(file_path)
+        except Exception as e:
+            if verbose:
+                error_msg = f"Failed to calculate hash for {file_path.name}: {str(e)}"
+                print(error_msg)
+            file_hash = None
+        
+        # Get duration
+        duration = get_duration(file_path, base_path, verbose)
+        
+        # Check if duration extraction failed
+        duration_error = None
+        if isinstance(duration, str):  # Error message
+            duration_error = duration
+            duration = 0
+        else:
+            # Debug mode: check for zero duration on large files
+            if debug and duration == 0 and file_size > 1024 * 1024:  # 1MB threshold
+                debug_msg = f"DEBUG: Zero duration detected for large file: {file_path.relative_to(base_path)} ({file_size / (1024*1024):.1f} MB)"
+                print(debug_msg)
+                breakpoint()
+        
+        return {
+            'file_path': str(file_path),
+            'relative_path': str(file_path.relative_to(base_path)),
+            'duration': duration,
+            'size': file_size,
+            'hash': file_hash,
+            'error': duration_error
+        }
+        
+    except Exception as e:
+        return {
+            'file_path': str(file_path),
+            'relative_path': str(file_path.relative_to(base_path)),
+            'duration': 0,
+            'size': 0,
+            'hash': None,
+            'error': f"Failed to process file: {str(e)}"
+        }
 
 
 class FileSizeTreeChecker:
@@ -299,6 +359,22 @@ class FileSizeTreeChecker:
         )
         self.debug_check.pack(anchor="w", padx=5, pady=2)
 
+        # Thread count option
+        self.thread_frame = ttk.Frame(self.options_frame)
+        self.thread_frame.pack(fill="x", padx=5, pady=2)
+        
+        ttk.Label(self.thread_frame, text="Number of processing threads:").pack(side="left")
+        
+        self.thread_count = tk.IntVar(value=4)
+        self.thread_spinbox = ttk.Spinbox(
+            self.thread_frame, 
+            from_=1, 
+            to=16, 
+            width=5, 
+            textvariable=self.thread_count
+        )
+        self.thread_spinbox.pack(side="left", padx=(5, 0))
+
         # Progress
         self.progress_frame = ttk.LabelFrame(self.main_container, text="Progress")
         self.progress_frame.grid(row=4, column=0, sticky="nsew", padx=5, pady=2)
@@ -350,6 +426,7 @@ class FileSizeTreeChecker:
         # Thread control
         self.processing_thread = None
         self.cancel_requested = False
+        self.executor = None
 
         # Message queue for progress updates
         self.message_queue = []
@@ -552,90 +629,91 @@ class FileSizeTreeChecker:
                 f"Found {len(media_files)} media files ({total_size_gb:.2f} GB)"
             )
 
-            # Process files
+            # Get processing parameters
+            num_threads = self.thread_count.get()
+            verbose = self.verbose_mode.get()
+            debug = self.debug_mode.get()
+
+            self.log_message(f"Starting processing with {num_threads} threads...")
+
+            # Process files using ThreadPoolExecutor
             current_duration = 0
             processed_size = 0
-            estimated_total = 0  # Initialize with 0
-            failed_size = 0  # Track size of failed files
-            total_hash_time = 0  # Track total time spent on hash computation
+            estimated_total = 0
+            failed_size = 0
+            completed_files = 0
+            start_time = time.time()
 
-            self.log_message("Starting hash computation for duplicate detection...")
-
-            for i, file in enumerate(media_files):
-                # Calculate estimated total duration
-                if processed_size > 0:
-                    estimated_total = (total_size / processed_size) * current_duration
-                if self.cancel_requested:
-                    self.log_message("\nProcessing cancelled by user")
-                    self.log_message(
-                        f"Duration of all files seen so far: {current_duration//3600}h {(current_duration%3600)//60}m"
-                    )
-                    self.log_message(
-                        f"Estimated duration for all the files (seen and unseen): {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
-                    )
-                    break
-
-                # Calculate file hash for duplicate detection
-                hash_start_time = time.time()
-                try:
-                    file_hash = calculate_file_hash(file)
-                except Exception as e:
-                    if self.verbose_mode.get():
-                        self.queue_message(
-                            f"Failed to calculate hash for {file.name}: {str(e)}"
-                        )
-                    file_hash = None
-                hash_end_time = time.time()
-                total_hash_time += hash_end_time - hash_start_time
-
-                duration = get_duration(file, path, self.verbose_mode.get())
-                file_size = file.stat().st_size
-
-                if isinstance(duration, str):  # Check if it's an error message
-                    failed_files.append(str(file.relative_to(path)))
-                    failed_size += file_size
-                    self.queue_message(duration)  # Log the error message
-                    duration = 0  # Treat as 0 duration for calculations
-                else:
-                    # Debug mode: breakpoint on 0 duration for files larger than 1MB
-                    if (
-                        self.debug_mode.get()
-                        and duration == 0
-                        and file_size > 1024 * 1024
-                    ):  # 1MB threshold
-                        self.log_message(
-                            f"DEBUG: Zero duration detected for large file: {file.relative_to(path)} ({file_size / (1024*1024):.1f} MB)"
-                        )
-                        breakpoint()
-
-                current_duration += duration
-                processed_size += file_size
-
-                # Track duplicates by hash
-                if file_hash:
-                    if file_hash in file_hashes:
-                        file_hashes[file_hash].append(str(file.relative_to(path)))
-                    else:
-                        file_hashes[file_hash] = [str(file.relative_to(path))]
-
-                # Store results
-                results[str(file)] = {
-                    "duration": duration,
-                    "size": file_size,
-                    "hash": file_hash,
+            with ThreadPoolExecutor(max_workers=num_threads) as executor:
+                self.executor = executor  # Store reference for cancellation
+                
+                # Submit all files for processing
+                future_to_file = {
+                    executor.submit(process_single_file, file, path, verbose, debug): file 
+                    for file in media_files
                 }
 
-                # Calculate estimated total duration
-                if processed_size > 0:
-                    estimated_total = (total_size / processed_size) * current_duration
-                    percent_done = (i + 1) / len(media_files) * 100
-                    progress_msg = (
-                        f"[{i+1}/{len(media_files)} ({percent_done:.1f}%)] Sum of durations so far: {current_duration//3600}h {(current_duration%3600)//60}m | "
-                        f"Estimated total for all files: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
-                    )
+                # Process results as they complete
+                for future in as_completed(future_to_file):
+                    if self.cancel_requested:
+                        self.log_message("\nProcessing cancelled by user")
+                        executor.shutdown(wait=False)
+                        break
 
-                    if i % 10 == 0:  # Update progress every 10 files
-                        self.queue_message(progress_msg)
+                    try:
+                        file_result = future.result()
+                        completed_files += 1
+                        
+                        # Extract results
+                        duration = file_result['duration']
+                        file_size = file_result['size']
+                        file_hash = file_result['hash']
+                        error = file_result['error']
+                        
+                        current_duration += duration
+                        processed_size += file_size
+
+                        # Handle errors
+                        if error:
+                            failed_files.append(file_result['relative_path'])
+                            failed_size += file_size
+                            if verbose:
+                                self.queue_message(error)
+
+                        # Track duplicates by hash
+                        if file_hash:
+                            if file_hash in file_hashes:
+                                file_hashes[file_hash].append(file_result['relative_path'])
+                            else:
+                                file_hashes[file_hash] = [file_result['relative_path']]
+
+                        # Store results
+                        results[file_result['file_path']] = {
+                            "duration": duration,
+                            "size": file_size,
+                            "hash": file_hash,
+                        }
+
+                        # Calculate progress and estimated total
+                        if processed_size > 0:
+                            estimated_total = (total_size / processed_size) * current_duration
+                            percent_done = completed_files / len(media_files) * 100
+                            progress_msg = (
+                                f"[{completed_files}/{len(media_files)} ({percent_done:.1f}%)] "
+                                f"Sum of durations so far: {current_duration//3600}h {(current_duration%3600)//60}m | "
+                                f"Estimated total for all files: {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+                            )
+
+                            if completed_files % 10 == 0:  # Update progress every 10 files
+                                self.queue_message(progress_msg)
+
+                    except Exception as e:
+                        self.queue_message(f"Error processing file: {str(e)}")
+
+                self.executor = None  # Clear reference
+
+            # Calculate processing time
+            processing_time = time.time() - start_time
 
             # Identify duplicate groups (groups with more than one file)
             duplicate_groups = [
@@ -645,12 +723,21 @@ class FileSizeTreeChecker:
                 len(group) - 1 for group in duplicate_groups
             )  # Don't count the original
 
-            self.log_message(
-                f"\nHash computation completed in {total_hash_time:.2f} seconds"
-            )
-            self.log_message(
-                f"Total duration: {current_duration//3600}h {(current_duration%3600)//60}m"
-            )
+            if not self.cancel_requested:
+                self.log_message(
+                    f"\nProcessing completed in {processing_time:.2f} seconds using {num_threads} threads"
+                )
+                self.log_message(
+                    f"Total duration: {current_duration//3600}h {(current_duration%3600)//60}m"
+                )
+            else:
+                self.log_message(
+                    f"Duration of all files seen so far: {current_duration//3600}h {(current_duration%3600)//60}m"
+                )
+                if estimated_total > 0:
+                    self.log_message(
+                        f"Estimated duration for all the files (seen and unseen): {estimated_total//3600:.0f}h {(estimated_total%3600)//60:.0f}m"
+                    )
 
             # Report duplicate files
             if duplicate_groups:
@@ -737,8 +824,12 @@ class FileSizeTreeChecker:
         """Cancel the current processing operation."""
         if self.processing_thread and self.processing_thread.is_alive():
             self.cancel_requested = True
-            self.log_message("\nCancelling... Please wait for current file to finish.")
+            self.log_message("\nCancelling... Please wait for current files to finish.")
             self.cancel_button.config(state="disabled")
+            
+            # Also shutdown the executor if it exists
+            if self.executor:
+                self.executor.shutdown(wait=False)
 
     def open_github(self):
         """Open the GitHub repository in the default web browser."""
