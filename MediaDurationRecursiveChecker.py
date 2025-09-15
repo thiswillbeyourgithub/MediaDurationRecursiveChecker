@@ -480,7 +480,7 @@ class FileSizeTreeChecker:
 
         # Configure grid weights for main container
         self.main_container.grid_rowconfigure(
-            3, weight=1
+            4, weight=1
         )  # Progress area gets extra space
         self.main_container.grid_columnconfigure(0, weight=1)
 
