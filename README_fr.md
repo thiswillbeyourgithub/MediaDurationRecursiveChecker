@@ -34,11 +34,19 @@ Vous avez deux options pour exécuter MediaDurationRecursiveChecker :
 ### 1. Exécuter depuis les sources (interface graphique)
 1. Installer les packages Python requis :
 ```bash
-# Sur macOS :
-sudo python3 -m pip install moviepy pyperclip
+# Installation de base (toutes plateformes) :
+pip install -r requirements.txt
 
-# Sur les autres plateformes :
-pip install moviepy pyperclip
+# Installation spécifique à la plateforme :
+# Pour macOS :
+pip install -r requirements-macos.txt
+# Pour Linux :
+pip install -r requirements-linux.txt
+# Pour Windows :
+pip install -r requirements-windows.txt
+
+# Pour le développement :
+pip install -r requirements-dev.txt
 ```
 2. S'assurer que `ffmpeg` est installé sur le système
 3. Exécuter le script :
