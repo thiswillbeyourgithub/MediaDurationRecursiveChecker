@@ -64,6 +64,8 @@ https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker
 # ]
 # ///
 
+__version__ = "1.0.0"
+
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import pyperclip
