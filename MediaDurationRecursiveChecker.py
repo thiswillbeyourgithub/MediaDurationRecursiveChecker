@@ -24,6 +24,7 @@ Key Features:
 Requirements:
 - Python 3.8+
 - moviepy (for media duration extraction)
+- pymediainfo (fallback for problematic files)
 - pyperclip (for clipboard integration)
 
 Usage:
@@ -61,6 +62,7 @@ https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker
 #     "numpy>=1.25.0",
 #     "moviepy>=1.0.0",
 #     "pyperclip>=1.9.0",
+#     "pymediainfo>=6.0.0",
 # ]
 # ///
 
@@ -82,6 +84,11 @@ import platform
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from moviepy.video.io.VideoFileClip import VideoFileClip
+try:
+    from pymediainfo import MediaInfo
+    PYMEDIAINFO_AVAILABLE = True
+except ImportError:
+    PYMEDIAINFO_AVAILABLE = False
 
 
 def calculate_file_hash(file_path: Path, chunk_size: int = 8192) -> str:
@@ -116,6 +123,9 @@ def get_duration(
     Returns:
         Duration in seconds, or error message if failed to parse
     """
+    filename = str(file_path.relative_to(base_path))
+    
+    # First try moviepy
     try:
         # Suppress warnings unless verbose mode
         if not verbose:
@@ -123,13 +133,41 @@ def get_duration(
         with VideoFileClip(str(file_path)) as clip:
             val = int(clip.duration)
             if verbose:
-                filename = str(file_path.relative_to(base_path))
-                print(f"{filename:<50}: {val:>6}s")
+                print(f"{filename:<50}: {val:>6}s (moviepy)")
             return val
-    except Exception as e:
-        error_msg = f"Error processing {file_path.name}: {str(e)}"
+    except Exception as moviepy_error:
         if verbose:
-            filename = str(file_path.relative_to(base_path))
+            print(f"moviepy failed for {filename}: {str(moviepy_error)}")
+        
+        # Fallback to pymediainfo if available
+        if PYMEDIAINFO_AVAILABLE:
+            try:
+                media_info = MediaInfo.parse(str(file_path))
+                # Look for duration in video or audio tracks
+                duration_ms = None
+                for track in media_info.tracks:
+                    if track.track_type in ['Video', 'Audio'] and track.duration:
+                        duration_ms = track.duration
+                        break
+                
+                if duration_ms:
+                    val = int(duration_ms / 1000)  # Convert milliseconds to seconds
+                    if verbose:
+                        print(f"{filename:<50}: {val:>6}s (pymediainfo)")
+                    return val
+                else:
+                    raise Exception("No duration information found in media tracks")
+                    
+            except Exception as pymediainfo_error:
+                if verbose:
+                    print(f"pymediainfo also failed for {filename}: {str(pymediainfo_error)}")
+                # Both methods failed, return combined error message
+                error_msg = f"Error processing {file_path.name}: moviepy failed ({str(moviepy_error)}), pymediainfo failed ({str(pymediainfo_error)})"
+        else:
+            # pymediainfo not available, return moviepy error
+            error_msg = f"Error processing {file_path.name}: {str(moviepy_error)} (pymediainfo not available as fallback)"
+        
+        if verbose:
             print(f"E: {filename:<50}: {error_msg}")
         return error_msg
 
