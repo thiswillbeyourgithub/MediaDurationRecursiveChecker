@@ -515,6 +515,8 @@ class FileSizeTreeChecker:
             path = Path(folder)
             results = {}
             failed_files = []  # Track failed files
+            file_hashes = {}  # Track files by hash for duplicate detection
+            duplicate_groups = []  # List of lists of duplicate files
 
             # Get all media files
             media_files = [
@@ -554,6 +556,16 @@ class FileSizeTreeChecker:
                     )
                     break
 
+                # Calculate file hash for duplicate detection
+                try:
+                    file_hash = calculate_file_hash(file)
+                except Exception as e:
+                    if self.verbose_mode.get():
+                        self.queue_message(
+                            f"Failed to calculate hash for {file.name}: {str(e)}"
+                        )
+                    file_hash = None
+
                 duration = get_duration(file, path, self.verbose_mode.get())
                 file_size = file.stat().st_size
 
@@ -566,8 +578,19 @@ class FileSizeTreeChecker:
                 current_duration += duration
                 processed_size += file_size
 
+                # Track duplicates by hash
+                if file_hash:
+                    if file_hash in file_hashes:
+                        file_hashes[file_hash].append(str(file.relative_to(path)))
+                    else:
+                        file_hashes[file_hash] = [str(file.relative_to(path))]
+
                 # Store results
-                results[str(file)] = {"duration": duration, "size": file_size}
+                results[str(file)] = {
+                    "duration": duration,
+                    "size": file_size,
+                    "hash": file_hash,
+                }
 
                 # Calculate estimated total duration
                 if processed_size > 0:
@@ -581,9 +604,34 @@ class FileSizeTreeChecker:
                     if i % 10 == 0:  # Update progress every 10 files
                         self.queue_message(progress_msg)
 
+            # Identify duplicate groups (groups with more than one file)
+            duplicate_groups = [
+                files for files in file_hashes.values() if len(files) > 1
+            ]
+            total_duplicates = sum(
+                len(group) - 1 for group in duplicate_groups
+            )  # Don't count the original
+
             self.log_message(
                 f"\nTotal duration: {current_duration//3600}h {(current_duration%3600)//60}m"
             )
+
+            # Report duplicate files
+            if duplicate_groups:
+                self.log_message(
+                    f"\nFound {len(duplicate_groups)} groups of duplicate files ({total_duplicates} duplicate files total):"
+                )
+                if self.verbose_mode.get():
+                    for i, group in enumerate(duplicate_groups, 1):
+                        self.log_message(f"  Group {i}: {len(group)} identical files")
+                        for file_path in group:
+                            self.log_message(f"    - {file_path}")
+                else:
+                    self.log_message(
+                        "  (Enable verbose mode to see detailed duplicate file listing)"
+                    )
+            else:
+                self.log_message("\nNo duplicate files found")
 
             # Add extra information if there were failed files
             if failed_files:
@@ -603,8 +651,31 @@ class FileSizeTreeChecker:
             # Write results to JSON file if enabled
             if self.save_json.get():
                 outpath = Path(self.output_path.get())
+
+                # Prepare comprehensive output data
+                output_data = {
+                    "summary": {
+                        "total_files": len(media_files),
+                        "total_size_gb": total_size_gb,
+                        "total_duration_seconds": current_duration,
+                        "total_duration_readable": f"{current_duration//3600}h {(current_duration%3600)//60}m",
+                        "failed_files_count": len(failed_files),
+                        "duplicate_groups_count": len(duplicate_groups),
+                        "total_duplicate_files": total_duplicates,
+                    },
+                    "files": results,
+                }
+
+                # Add duplicate groups if any exist
+                if duplicate_groups:
+                    output_data["duplicate_groups"] = duplicate_groups
+
+                # Add failed files list if any exist
+                if failed_files:
+                    output_data["failed_files"] = failed_files
+
                 with open(outpath, "w", encoding="utf-8") as f:
-                    json.dump(results, f, indent=2)
+                    json.dump(output_data, f, indent=2)
                 self.log_message(f"Results saved to {outpath}")
 
             messagebox.showinfo(
