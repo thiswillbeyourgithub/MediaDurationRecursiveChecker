@@ -209,11 +209,11 @@ def get_duration(
         with VideoFileClip(str(file_path)) as clip:
             val = int(clip.duration)
             if verbose:
-                logger.info(
+                logger.warning(
                     f"  ✓ Method {method_num}/{total_methods} SUCCESS for {filename}: {val}s (moviepy)"
                 )
             else:
-                logger.info(f"{filename:<50}: {val:>6}s (moviepy)")
+                logger.warning(f"{filename:<50}: {val:>6}s (moviepy)")
             return val
     except Exception as e:
         moviepy_error = e
@@ -251,11 +251,11 @@ def get_duration(
                 if "format" in probe_data and "duration" in probe_data["format"]:
                     val = int(float(probe_data["format"]["duration"]))
                     if verbose:
-                        logger.info(
+                        logger.warning(
                             f"  ✓ Method {method_num}/{total_methods} SUCCESS for {filename}: {val}s (ffprobe)"
                         )
                     else:
-                        logger.info(f"{filename:<50}: {val:>6}s (ffprobe)")
+                        logger.warning(f"{filename:<50}: {val:>6}s (ffprobe)")
                     return val
                 else:
                     raise Exception("Duration not found in ffprobe output")
