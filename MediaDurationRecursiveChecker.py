@@ -84,8 +84,10 @@ import platform
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from moviepy.video.io.VideoFileClip import VideoFileClip
+
 try:
     from pymediainfo import MediaInfo
+
     PYMEDIAINFO_AVAILABLE = True
 except ImportError:
     PYMEDIAINFO_AVAILABLE = False
@@ -124,7 +126,7 @@ def get_duration(
         Duration in seconds, or error message if failed to parse
     """
     filename = str(file_path.relative_to(base_path))
-    
+
     # First try moviepy
     try:
         # Suppress warnings unless verbose mode
@@ -138,7 +140,7 @@ def get_duration(
     except Exception as moviepy_error:
         if verbose:
             print(f"moviepy failed for {filename}: {str(moviepy_error)}")
-        
+
         # Fallback to pymediainfo if available
         if PYMEDIAINFO_AVAILABLE:
             try:
@@ -146,10 +148,10 @@ def get_duration(
                 # Look for duration in video or audio tracks
                 duration_ms = None
                 for track in media_info.tracks:
-                    if track.track_type in ['Video', 'Audio'] and track.duration:
+                    if track.track_type in ["Video", "Audio"] and track.duration:
                         duration_ms = track.duration
                         break
-                
+
                 if duration_ms:
                     val = int(duration_ms / 1000)  # Convert milliseconds to seconds
                     if verbose:
@@ -157,16 +159,18 @@ def get_duration(
                     return val
                 else:
                     raise Exception("No duration information found in media tracks")
-                    
+
             except Exception as pymediainfo_error:
                 if verbose:
-                    print(f"pymediainfo also failed for {filename}: {str(pymediainfo_error)}")
+                    print(
+                        f"pymediainfo also failed for {filename}: {str(pymediainfo_error)}"
+                    )
                 # Both methods failed, return combined error message
                 error_msg = f"Error processing {file_path.name}: moviepy failed ({str(moviepy_error)}), pymediainfo failed ({str(pymediainfo_error)})"
         else:
             # pymediainfo not available, return moviepy error
             error_msg = f"Error processing {file_path.name}: {str(moviepy_error)} (pymediainfo not available as fallback)"
-        
+
         if verbose:
             print(f"E: {filename:<50}: {error_msg}")
         return error_msg
