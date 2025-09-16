@@ -79,7 +79,7 @@ Note: This has been tested to work on macOS 11 and 12 when using the command:
 sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
 
-A pre-compiled .app for macOS is available in the 1.0.1 release.
+A pre-compiled .app for macOS is available in the [releases](https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker/releases) page.
 
 ## Output Example
 
