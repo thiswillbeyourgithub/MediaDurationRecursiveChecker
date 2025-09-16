@@ -33,12 +33,14 @@ This Python script calculates the total duration of media files (video/audio) in
 - Python 3.6+ (only tested on 3.8 and 3.11)
 - `moviepy` (for media duration extraction)
 - `pyperclip` (to handle copying and pasting the path)
+- `loguru` (to logs)
+- If possible, ffmpeg is used as a fallback.
 
 ## Installation and Usage
 
 You have two options to run MediaDurationRecursiveChecker:
 
-### 1. Run from Source (GUI)
+### 1. Run from Source
 1. Install required Python packages:
 ```bash
 # Basic installation (all platforms):
