@@ -126,16 +126,6 @@ The output JSON file contains comprehensive information:
 }
 ```
 
-## Additional Features
-
-- **GUI remembers last used folder** for convenience
-- **Configurable processing threads** (1-16) to optimize performance based on your system
-- **Minimum file size threshold** to skip tiny files that might not be actual media
-- **Debug mode** available for troubleshooting duration extraction issues
-- **Collapsible documentation** built into the GUI
-- **Platform-specific optimizations** for better cross-platform compatibility
-- **Keyboard shortcuts** for common operations (Ctrl+A, Ctrl+C, Ctrl+V)
-
 ## Notes
 
 - Files are processed in random order to provide better time estimates

@@ -126,16 +126,6 @@ Le fichier JSON de sortie contient des informations complètes :
 }
 ```
 
-## Fonctionnalités additionnelles
-
-- **L'interface se souvient du dernier dossier utilisé** pour plus de commodité
-- **Threads de traitement configurables** (1-16) pour optimiser les performances selon votre système
-- **Seuil de taille minimale de fichier** pour ignorer les petits fichiers qui ne sont peut-être pas des médias réels
-- **Mode debug** disponible pour résoudre les problèmes d'extraction de durée
-- **Documentation repliable** intégrée dans l'interface graphique
-- **Optimisations spécifiques à la plateforme** pour une meilleure compatibilité multiplateforme
-- **Raccourcis clavier** pour les opérations courantes (Ctrl+A, Ctrl+C, Ctrl+V)
-
 ## Notes
 
 - Les fichiers sont traités dans un ordre aléatoire pour fournir de meilleures estimations de temps
