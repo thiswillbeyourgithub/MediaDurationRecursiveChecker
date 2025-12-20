@@ -3,7 +3,7 @@
 
 Repository: https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker
 Author: thiswillbeyourgithub
-License: GPLv3
+License: AGPLv3
 
 This application calculates the total duration and size of media files in a directory tree.
 It's particularly useful for estimating total duration of video/audio collections.
