@@ -98,15 +98,25 @@ Si vous préférez le compiler vous-même :
 pip install pyinstaller
 ```
 2. Compiler l'exécutable :
-```bash
-pyinstaller --onefile --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --noconsole --hidden-import=imageio_ffmpeg
-```
-3. L'exécutable sera dans le répertoire `dist`
 
-Note : Cela a été testé pour fonctionner sur macOS 11 et 12 en utilisant la commande :
+**macOS** (commande utilisée par la CI pour produire les versions pré-compilées) :
 ```bash
-sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
+pyinstaller \
+  --onefile \
+  --windowed \
+  --name MediaDurationRecursiveChecker \
+  --hidden-import=imageio_ffmpeg \
+  --copy-metadata imageio \
+  --clean \
+  MediaDurationRecursiveChecker.py
 ```
+
+**Autres plateformes** (Linux / Windows) :
+```bash
+pyinstaller --onefile --name MediaDurationRecursiveChecker --hidden-import=imageio_ffmpeg --copy-metadata imageio --clean MediaDurationRecursiveChecker.py
+```
+
+3. L'exécutable sera dans le répertoire `dist`
 
 ## Exemple de sortie
 
