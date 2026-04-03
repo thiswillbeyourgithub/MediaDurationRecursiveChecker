@@ -86,7 +86,7 @@ Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont gén�
 - Le dossier [`build/`](build/) de ce dépôt (téléchargeable directement)
 
 > [!WARNING]
-> **Avertissement Gatekeeper macOS :** Cette application n'étant pas signée avec un certificat développeur Apple, macOS la bloquera au premier lancement. Vous verrez le message : *« App Name » ne peut pas être ouvert car Apple ne peut pas vérifier qu'il ne contient pas de logiciel malveillant.*
+    > **Avertissement Gatekeeper macOS :** Cette application n'étant pas signée avec un certificat développeur Apple, macOS la bloquera au premier lancement. Vous verrez le message : *« MediaDurationRecursiveChecker » ne peut pas être ouvert car Apple ne peut pas vérifier qu'il ne contient pas de logiciel malveillant.*
 >
 > Pour l'autoriser :
 > 1. Ouvrez **Réglages Système > Confidentialité et sécurité**

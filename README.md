@@ -86,7 +86,7 @@ Pre-compiled `.app` bundles for macOS are built automatically using GitHub Actio
 - The [`build/`](build/) folder in this repository (ready to download directly)
 
 > [!WARNING]
-> **macOS Gatekeeper notice:** Since this app is not signed with an Apple Developer certificate, macOS will block it on first launch. You will see: *"App Name" can't be opened because Apple cannot check it for malicious software.*
+> **macOS Gatekeeper notice:** Since this app is not signed with an Apple Developer certificate, macOS will block it on first launch. You will see: *"MediaDurationRecursiveChecker" can't be opened because Apple cannot check it for malicious software.*
 >
 > To allow it:
 > 1. Open **System Settings > Privacy & Security**
