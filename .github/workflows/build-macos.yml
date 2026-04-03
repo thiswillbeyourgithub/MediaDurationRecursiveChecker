@@ -43,6 +43,7 @@ jobs:
             --windowed \
             --name MediaDurationRecursiveChecker \
             --hidden-import=imageio_ffmpeg \
+            --copy-metadata imageio \
             --clean \
             MediaDurationRecursiveChecker.py
 
@@ -70,5 +71,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            MediaDurationRecursiveChecker-macos-intel/MediaDurationRecursiveChecker-macos-intel.zip
-            MediaDurationRecursiveChecker-macos-apple-silicon/MediaDurationRecursiveChecker-macos-apple-silicon.zip
+            MediaDurationRecursiveChecker-macos-macos-14-M1-silicon/MediaDurationRecursiveChecker-macos-macos-14-M1-silicon.zip
+            MediaDurationRecursiveChecker-macos-macos-15-intel/MediaDurationRecursiveChecker-macos-macos-15-intel.zip
+            MediaDurationRecursiveChecker-macos-macos-15-M1-silicon/MediaDurationRecursiveChecker-macos-macos-15-M1-silicon.zip
