@@ -5,6 +5,17 @@
 
 ![Screenshot of the GUI](gui.png)
 
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation and Usage](#installation-and-usage)
+  - [1. Run from Source](#1-run-from-source)
+  - [2. Build Your Own Executable](#2-build-your-own-executable)
+- [Output Example](#output-example)
+- [JSON Output Format](#json-output-format)
+- [Notes](#notes)
+
 # MediaDurationRecursiveChecker
 
 This Python script calculates the total duration of media files (video/audio) in a directory and estimates the total processing time. It was created to help estimate the total duration of daily/rush footage on a hard drive. The project was renamed from FileSizeTreeChecker to MediaDurationRecursiveChecker to better reflect its purpose.
