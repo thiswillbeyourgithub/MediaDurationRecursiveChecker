@@ -85,6 +85,17 @@ Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont gén�
 - La page des [releases](https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker/releases)
 - Le dossier [`build/`](build/) de ce dépôt (téléchargeable directement)
 
+> [!WARNING]
+> **Avertissement Gatekeeper macOS :** Cette application n'étant pas signée avec un certificat développeur Apple, macOS la bloquera au premier lancement. Vous verrez le message : *« App Name » ne peut pas être ouvert car Apple ne peut pas vérifier qu'il ne contient pas de logiciel malveillant.*
+>
+> Pour l'autoriser :
+> 1. Ouvrez **Réglages Système > Confidentialité et sécurité**
+> 2. Faites défiler jusqu'au message *« MediaDurationRecursiveChecker » a été bloqué car il ne provient pas d'un développeur identifié*
+> 3. Cliquez sur **« Ouvrir quand même »**
+> 4. Dans la dernière boîte de dialogue de confirmation, cliquez sur **« Ouvrir »**
+>
+> Cette étape n'est nécessaire qu'une seule fois. Ces avertissements Gatekeeper sont standard sur macOS Ventura (13) et versions ultérieures.
+
 ## Exemple de sortie
 
 ```
