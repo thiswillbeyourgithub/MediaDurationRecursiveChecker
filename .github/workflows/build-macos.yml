@@ -19,7 +19,7 @@ jobs:
             name: macos-15-intel
           - os: macos-15
             arch: arm64
-            name: macos-14-M1-silicon
+            name: macos-15-M1-silicon
 
     runs-on: ${{ matrix.os }}
 
