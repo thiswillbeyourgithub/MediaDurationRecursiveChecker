@@ -81,9 +81,7 @@ Note : Cela a été testé pour fonctionner sur macOS 11 et 12 en utilisant la c
 sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
 
-Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont générés automatiquement via des runners GitHub Actions et sont disponibles à deux endroits :
-- La page des [releases](https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker/releases)
-- Le dossier [`build/`](build/) de ce dépôt (téléchargeable directement)
+Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont générés automatiquement via des runners GitHub Actions et sont disponibles dans le dossier [`builds/`](builds/) de ce dépôt (téléchargeable directement).
 
 > [!WARNING]
     > **Avertissement Gatekeeper macOS :** Cette application n'étant pas signée avec un certificat développeur Apple, macOS la bloquera au premier lancement. Vous verrez le message : *« MediaDurationRecursiveChecker » ne peut pas être ouvert car Apple ne peut pas vérifier qu'il ne contient pas de logiciel malveillant.*
