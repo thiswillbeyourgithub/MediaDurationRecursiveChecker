@@ -10,8 +10,9 @@
 - [Fonctionnalités](#fonctionnalités)
 - [Prérequis](#prérequis)
 - [Installation et Utilisation](#installation-et-utilisation)
-  - [1. Exécuter depuis les sources](#1-exécuter-depuis-les-sources)
-  - [2. Compiler votre propre exécutable](#2-compiler-votre-propre-exécutable)
+  - [1. Télécharger l'application pré-compilée (Recommandé)](#1-télécharger-lapplication-pré-compilée-recommandé)
+  - [2. Exécuter depuis les sources](#2-exécuter-depuis-les-sources)
+  - [3. Compiler votre propre exécutable](#3-compiler-votre-propre-exécutable)
 - [Exemple de sortie](#exemple-de-sortie)
 - [Format de sortie JSON](#format-de-sortie-json)
 - [Notes](#notes)
@@ -49,9 +50,24 @@ Ce script Python calcule la durée totale des fichiers multimédias (vidéo/audi
 
 ## Installation et Utilisation
 
-Vous avez deux options pour exécuter MediaDurationRecursiveChecker :
+Vous avez trois options pour exécuter MediaDurationRecursiveChecker :
 
-### 1. Exécuter depuis les sources
+### 1. Télécharger l'application pré-compilée (Recommandé)
+
+Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont générés automatiquement via GitHub Actions et sont disponibles dans le dossier [`builds/`](builds/) de ce dépôt. Téléchargez simplement le zip correspondant à votre architecture et extrayez-le.
+
+> [!WARNING]
+> **Avertissement Gatekeeper macOS :** Cette application n'étant pas signée avec un certificat développeur Apple, macOS la bloquera au premier lancement. Vous verrez le message : *« MediaDurationRecursiveChecker » ne peut pas être ouvert car Apple ne peut pas vérifier qu'il ne contient pas de logiciel malveillant.*
+>
+> Pour l'autoriser :
+> 1. Ouvrez **Réglages Système > Confidentialité et sécurité**
+> 2. Faites défiler jusqu'au message *« MediaDurationRecursiveChecker » a été bloqué car il ne provient pas d'un développeur identifié*
+> 3. Cliquez sur **« Ouvrir quand même »**
+> 4. Dans la dernière boîte de dialogue de confirmation, cliquez sur **« Ouvrir »**
+>
+> Cette étape n'est nécessaire qu'une seule fois. Ces avertissements Gatekeeper sont standard sur macOS Ventura (13) et versions ultérieures.
+
+### 2. Exécuter depuis les sources
 1. Installer les packages Python requis :
 ```bash
 # Installation de base (toutes plateformes) :
@@ -75,7 +91,7 @@ python MediaDurationRecursiveChecker.py
 ```
 4. Utiliser l'interface graphique pour sélectionner les dossiers et traiter les fichiers
 
-### 2. Compiler votre propre exécutable
+### 3. Compiler votre propre exécutable
 Si vous préférez le compiler vous-même :
 1. Installer PyInstaller :
 ```bash
@@ -91,19 +107,6 @@ Note : Cela a été testé pour fonctionner sur macOS 11 et 12 en utilisant la c
 ```bash
 sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
-
-Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont générés automatiquement via des runners GitHub Actions et sont disponibles dans le dossier [`builds/`](builds/) de ce dépôt (téléchargeable directement).
-
-> [!WARNING]
-    > **Avertissement Gatekeeper macOS :** Cette application n'étant pas signée avec un certificat développeur Apple, macOS la bloquera au premier lancement. Vous verrez le message : *« MediaDurationRecursiveChecker » ne peut pas être ouvert car Apple ne peut pas vérifier qu'il ne contient pas de logiciel malveillant.*
->
-> Pour l'autoriser :
-> 1. Ouvrez **Réglages Système > Confidentialité et sécurité**
-> 2. Faites défiler jusqu'au message *« MediaDurationRecursiveChecker » a été bloqué car il ne provient pas d'un développeur identifié*
-> 3. Cliquez sur **« Ouvrir quand même »**
-> 4. Dans la dernière boîte de dialogue de confirmation, cliquez sur **« Ouvrir »**
->
-> Cette étape n'est nécessaire qu'une seule fois. Ces avertissements Gatekeeper sont standard sur macOS Ventura (13) et versions ultérieures.
 
 ## Exemple de sortie
 

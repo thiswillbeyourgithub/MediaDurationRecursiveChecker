@@ -10,8 +10,9 @@
 - [Features](#features)
 - [Requirements](#requirements)
 - [Installation and Usage](#installation-and-usage)
-  - [1. Run from Source](#1-run-from-source)
-  - [2. Build Your Own Executable](#2-build-your-own-executable)
+  - [1. Download Pre-built App (Recommended)](#1-download-pre-built-app-recommended)
+  - [2. Run from Source](#2-run-from-source)
+  - [3. Build Your Own Executable](#3-build-your-own-executable)
 - [Output Example](#output-example)
 - [JSON Output Format](#json-output-format)
 - [Notes](#notes)
@@ -49,9 +50,24 @@ This Python script calculates the total duration of media files (video/audio) in
 
 ## Installation and Usage
 
-You have two options to run MediaDurationRecursiveChecker:
+You have three options to run MediaDurationRecursiveChecker:
 
-### 1. Run from Source
+### 1. Download Pre-built App (Recommended)
+
+Pre-compiled `.app` bundles for macOS (both Intel and Apple Silicon) are built automatically using GitHub Actions and are available in the [`builds/`](builds/) folder in this repository. Just download the zip for your architecture and extract it.
+
+> [!WARNING]
+> **macOS Gatekeeper notice:** Since this app is not signed with an Apple Developer certificate, macOS will block it on first launch. You will see: *"MediaDurationRecursiveChecker" can't be opened because Apple cannot check it for malicious software.*
+>
+> To allow it:
+> 1. Open **System Settings > Privacy & Security**
+> 2. Scroll down to find the message *"MediaDurationRecursiveChecker" was blocked from use because it is not from an identified developer*
+> 3. Click **"Open Anyway"**
+> 4. On the final confirmation dialog, click **"Open"**
+>
+> This is a one-time step. These Gatekeeper prompts are standard on macOS Ventura (13) and later.
+
+### 2. Run from Source
 1. Install required Python packages:
 ```bash
 # Basic installation (all platforms):
@@ -75,7 +91,7 @@ python MediaDurationRecursiveChecker.py
 ```
 4. Use the graphical interface to select folders and process files
 
-### 2. Build Your Own Executable
+### 3. Build Your Own Executable
 If you prefer to build it yourself:
 1. Install PyInstaller:
 ```bash
@@ -91,19 +107,6 @@ Note: This has been tested to work on macOS 11 and 12 when using the command:
 ```bash
 sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
-
-Pre-compiled `.app` bundles for macOS are built automatically using GitHub Actions runners (both Intel and Apple Silicon) and are available in the [`builds/`](builds/) folder in this repository (ready to download directly).
-
-> [!WARNING]
-> **macOS Gatekeeper notice:** Since this app is not signed with an Apple Developer certificate, macOS will block it on first launch. You will see: *"MediaDurationRecursiveChecker" can't be opened because Apple cannot check it for malicious software.*
->
-> To allow it:
-> 1. Open **System Settings > Privacy & Security**
-> 2. Scroll down to find the message *"MediaDurationRecursiveChecker" was blocked from use because it is not from an identified developer*
-> 3. Click **"Open Anyway"**
-> 4. On the final confirmation dialog, click **"Open"**
->
-> This is a one-time step. These Gatekeeper prompts are standard on macOS Ventura (13) and later.
 
 ## Output Example
 
