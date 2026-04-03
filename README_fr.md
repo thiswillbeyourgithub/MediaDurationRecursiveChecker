@@ -81,7 +81,9 @@ Note : Cela a été testé pour fonctionner sur macOS 11 et 12 en utilisant la c
 sudo pyinstaller --onefile --windowed --name MediaDurationRecursiveChecker MediaDurationRecursiveChecker.py --clean
 ```
 
-Une version pré-compilée .app pour macOS est disponible sur la page des [releases](https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker/releases).
+Des bundles `.app` pré-compilés pour macOS (Intel et Apple Silicon) sont générés automatiquement via des runners GitHub Actions et sont disponibles à deux endroits :
+- La page des [releases](https://github.com/thiswillbeyourgithub/MediaDurationRecursiveChecker/releases)
+- Le dossier [`build/`](build/) de ce dépôt (téléchargeable directement)
 
 ## Exemple de sortie
 
