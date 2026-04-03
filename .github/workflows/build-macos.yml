@@ -11,10 +11,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-13
+          - os: macos-15-intel
             arch: x86_64
             name: intel
-          - os: macos-14
+          - os: macos-15
             arch: arm64
             name: apple-silicon
 
