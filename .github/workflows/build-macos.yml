@@ -71,6 +71,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            MediaDurationRecursiveChecker-macos-macos-14-M1-silicon/MediaDurationRecursiveChecker-macos-macos-14-M1-silicon.zip
-            MediaDurationRecursiveChecker-macos-macos-15-intel/MediaDurationRecursiveChecker-macos-macos-15-intel.zip
-            MediaDurationRecursiveChecker-macos-macos-15-M1-silicon/MediaDurationRecursiveChecker-macos-macos-15-M1-silicon.zip
+            MediaDurationRecursiveChecker-macos-macos-14-M1-silicon/macos-14-M1-silicon.zip
+            MediaDurationRecursiveChecker-macos-macos-15-intel/macos-15-intel.zip
+            MediaDurationRecursiveChecker-macos-macos-15-M1-silicon/macos-15-M1-silicon.zip
