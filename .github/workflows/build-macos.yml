@@ -11,12 +11,15 @@ jobs:
     strategy:
       matrix:
         include:
+          - os: macos-14
+            arch: arm64
+            name: macos-14-M1-silicon
           - os: macos-15-intel
             arch: x86_64
-            name: intel
+            name: macos-15-intel
           - os: macos-15
             arch: arm64
-            name: apple-silicon
+            name: macos-14-M1-silicon
 
     runs-on: ${{ matrix.os }}
 
